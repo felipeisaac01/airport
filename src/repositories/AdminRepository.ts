@@ -4,7 +4,7 @@ import { IAdminRepository } from "../domain/interfaces/repositories/AdminReposit
 export class AdminRepository implements IAdminRepository {
     constructor(private client: PrismaClient) {}
 
-    async get(user: string) {
-        return this.client.admin.findFirst({ where: { user } });
+    async get(username: string) {
+        return this.client.admin.findFirst({ where: { username } });
     }
 }

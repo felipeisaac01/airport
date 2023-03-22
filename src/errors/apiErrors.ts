@@ -16,3 +16,15 @@ export class BadRequestError extends ApiError {
         super(message, code, 400)
     }
 }
+
+export class UnauthorizedError extends ApiError {
+    constructor(message: string, code: string) {
+        super(message, code, 401)
+    }
+}
+
+export class NotFoundError extends ApiError {
+    constructor(message: string, code: string) {
+        super(message, code, 404)
+    }
+}
