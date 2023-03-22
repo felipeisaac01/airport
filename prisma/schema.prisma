@@ -43,14 +43,54 @@ model City {
 }
 
 model Airport {
+  id              String    @id @default(uuid())
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @default(now()) @updatedAt
+  deletedAt       DateTime?
+  city            City      @relation(fields: [cityId], references: [id])
+  cityId          String
+  name            String
+  iataCode        String    @unique
+  flightsLeaving  Flight[]  @relation("flightsLeaving")
+  flightsArriving Flight[]  @relation("flightsArriving")
+
+  @@map("airports")
+}
+
+model Flight {
+  id                   String          @id @default(uuid())
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @default(now()) @updatedAt
+  deletedAt            DateTime?
+  departureTime        DateTime
+  code                 String          @unique
+  departureAirport     Airport         @relation("flightsLeaving", fields: [departureAirportId], references: [id])
+  departureAirportId   String
+  destinationAirport   Airport         @relation("flightsArriving", fields: [destinationAirportId], references: [id])
+  destinationAirportId String
+  flightClasses        FlightClasses[]
+
+  @@map("flights")
+}
+
+enum FlightClassOptions {
+  A
+  B
+  C
+  D
+  E
+}
+
+model FlightClasses {
   id        String    @id @default(uuid())
   createdAt DateTime  @default(now())
   updatedAt DateTime  @default(now()) @updatedAt
   deletedAt DateTime?
-  city      City      @relation(fields: [cityId], references: [id])
-  cityId    String
-  name      String
-  iataCode  String    @unique
+  flight    Flight    @relation(fields: [flightId], references: [id])
+  flightId  String
+  quantity  Int
+  value     Int
+  type      FlightClassOptions
 
-  @@map("airports")
+  @@map("flight_classes")
 }
