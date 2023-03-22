@@ -3,6 +3,6 @@ import { login } from "../controllers/AuthControllers"
 
 const routes = Router()
 
-routes.post("/airports", login)
+routes.post("/login", login)
 
 export default routes

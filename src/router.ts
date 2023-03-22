@@ -1,6 +1,8 @@
+require("express-async-errors");
+
 import { Router } from "express";
-import airportRoutes from "./routes"
-import authRoutes from "./routes";
+import { authRoutes } from "./routes";
+import { airportRoutes } from "./routes";
 
 const routes = Router();
 

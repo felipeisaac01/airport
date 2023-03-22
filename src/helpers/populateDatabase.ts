@@ -98,13 +98,13 @@ export async function populateDatabase() {
 
     }
 
-    const admin = await prismaClient.admin.findFirst({ where: { user: "originalAdmin" } })
+    const admin = await prismaClient.admin.findFirst({ where: { username: "originalAdmin" } })
 
     if (!admin) {
         await prismaClient.admin.create({
             data: {
                 password: await hashPassword("123456"),
-                user: "originalAdmin"
+                username: "originalAdmin"
             }
         })
     }

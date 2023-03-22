@@ -1,5 +1,5 @@
 import express from "express";
-import routes from "./routes"
+import routes from "./router"
 import dotenv from "dotenv"
 import { errorHandler } from "./errors/handler";
 
