@@ -2,10 +2,13 @@ import { Request, Response } from "express";
 import { IAuthTokenDto, ILoginRequestDto } from "../domain/dtos/controllers/auth";
 import { NotFoundError, UnauthorizedError } from "../errors/apiErrors";
 import { generateAuthToken } from "../helpers/auth";
+import { bodyValidator } from "../helpers/bodyValidator";
 import { comparePassword } from "../helpers/crypt";
 import { repositories } from "../repositories";
+import { loginBodySchema } from "../validator/auth";
 
 export async function login(req: Request<{}, {}, ILoginRequestDto>, res: Response<IAuthTokenDto>) {
+    bodyValidator(loginBodySchema, req.body, "AU")
     const { username, password } = req.body;
 
     const user = await repositories.admin.get(username);
