@@ -9,3 +9,37 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+enum federative_units {
+  BA
+  SP
+  RJ
+  MG
+  RN
+  RS
+}
+
+model City {
+  id             String           @id @default(uuid())
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @default(now()) @updatedAt
+  deletedAt      DateTime?
+  name           String
+  federativeUnit federative_units
+  airports       Airport[]
+
+  @@map("cities")
+}
+
+model Airport {
+  id        String    @id @default(uuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now()) @updatedAt
+  deletedAt DateTime?
+  city      City      @relation(fields: [cityId], references: [id])
+  cityId    String
+  name      String
+  iataCode  String    @unique
+
+  @@map("airports")
+}
