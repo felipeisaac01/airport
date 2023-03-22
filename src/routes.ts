@@ -1,8 +1,10 @@
 import { Router } from "express";
-import { getAirports } from "./controllers/AirportControllers";
+import airportRoutes from "./routes"
+import authRoutes from "./routes";
 
 const routes = Router();
 
-routes.use(getAirports)
+routes.use(airportRoutes);
+routes.use(authRoutes);
 
 export default routes
