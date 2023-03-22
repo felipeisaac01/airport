@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "federative_units" AS ENUM ('BA', 'SP', 'RJ', 'MG', 'RN', 'RS');
+CREATE TYPE "federativeUnits" AS ENUM ('BA', 'SP', 'RJ', 'MG', 'RN', 'RS');
 
 -- CreateTable
 CREATE TABLE "cities" (
@@ -8,7 +8,7 @@ CREATE TABLE "cities" (
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "deletedAt" TIMESTAMP(3),
     "name" TEXT NOT NULL,
-    "federativeUnit" "federative_units" NOT NULL,
+    "federativeUnit" "federativeUnits" NOT NULL,
 
     CONSTRAINT "cities_pkey" PRIMARY KEY ("id")
 );
