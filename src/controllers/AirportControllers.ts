@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import { IGetAirportResponseDTO } from "../domain/dtos/controllers/airports";
-import { airportRepository } from "../repositories";
+import { repositories } from "../repositories";
 
 export async function getAirports(_req: Request, res: Response<IGetAirportResponseDTO[]>) {
-    const airports = await airportRepository.getAll();
+    const airports = await repositories.airport.getAll();
 
     res.send(airports.map(airport => {
         return {

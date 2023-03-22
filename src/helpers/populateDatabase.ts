@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { hashPassword } from "./crypt";
 
 export async function populateDatabase() {
     const prismaClient = new PrismaClient()
@@ -95,6 +96,18 @@ export async function populateDatabase() {
             data: airportsToInsert
         })
 
-        prismaClient.$disconnect()
     }
+
+    const admin = await prismaClient.admin.findFirst({ where: { user: "originalAdmin" } })
+
+    if (!admin) {
+        await prismaClient.admin.create({
+            data: {
+                password: await hashPassword("123456"),
+                user: "originalAdmin"
+            }
+        })
+    }
+    
+    prismaClient.$disconnect()
 }
