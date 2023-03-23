@@ -17,6 +17,7 @@ export interface ICreateFlightMethodResponseDto {
     code: string,
     createdAt: Date,
     departureTime: Date,
+    status: string,
     departureAirport: {
         iataCode: string,
         name: string,

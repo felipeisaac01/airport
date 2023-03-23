@@ -1,4 +1,7 @@
 -- CreateEnum
+CREATE TYPE "FlightStatus" AS ENUM ('CONFIRMED', 'CANCELED');
+
+-- CreateEnum
 CREATE TYPE "FlightClassOptions" AS ENUM ('A', 'B', 'C', 'D', 'E');
 
 -- CreateTable
@@ -11,6 +14,7 @@ CREATE TABLE "flights" (
     "code" TEXT NOT NULL,
     "departureAirportId" TEXT NOT NULL,
     "destinationAirportId" TEXT NOT NULL,
+    "status" "FlightStatus" NOT NULL DEFAULT 'CONFIRMED',
 
     CONSTRAINT "flights_pkey" PRIMARY KEY ("id")
 );

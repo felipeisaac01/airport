@@ -57,18 +57,25 @@ model Airport {
   @@map("airports")
 }
 
+enum FlightStatus {
+  CONFIRMED
+  CANCELED
+}
+
 model Flight {
-  id                   String          @id @default(uuid())
-  createdAt            DateTime        @default(now())
-  updatedAt            DateTime        @default(now()) @updatedAt
+  id                   String       @id @default(uuid())
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @default(now()) @updatedAt
   deletedAt            DateTime?
   departureTime        DateTime
-  code                 String          @unique
-  departureAirport     Airport         @relation("flightsLeaving", fields: [departureAirportId], references: [id])
+  code                 String       @unique
+  departureAirport     Airport      @relation("flightsLeaving", fields: [departureAirportId], references: [id])
   departureAirportId   String
-  destinationAirport   Airport         @relation("flightsArriving", fields: [destinationAirportId], references: [id])
+  destinationAirport   Airport      @relation("flightsArriving", fields: [destinationAirportId], references: [id])
   destinationAirportId String
-  flightClasses        FlightClasses[]
+  status               FlightStatus @default(CONFIRMED)
+
+  flightClasses FlightClasses[]
 
   @@map("flights")
 }
@@ -82,11 +89,11 @@ enum FlightClassOptions {
 }
 
 model FlightClasses {
-  id        String    @id @default(uuid())
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @default(now()) @updatedAt
+  id        String             @id @default(uuid())
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @default(now()) @updatedAt
   deletedAt DateTime?
-  flight    Flight    @relation(fields: [flightId], references: [id])
+  flight    Flight             @relation(fields: [flightId], references: [id])
   flightId  String
   quantity  Int
   value     Int
