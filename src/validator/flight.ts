@@ -10,3 +10,11 @@ export const createFlightBodyValidator = Joi.object({
         type: Joi.string().required().valid("A", "B", "C", "D", "E"),
     })).required(), 
 })
+
+export const updateFlightBodyValidator = Joi.object({
+    flightId: Joi.string().required(),
+    departureAirportId: Joi.string(), 
+    destinationAirportId: Joi.string(),
+    departureTime: Joi.date().greater("now"),
+    code: Joi.string()
+})

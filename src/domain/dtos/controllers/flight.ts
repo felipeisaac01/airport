@@ -1,9 +1,9 @@
-import { IFlightClassesDTO } from "./FlightClasses";
+import { IFlightClassesDto } from "./FlightClasses";
 
 export interface ICreateFlightDto {
     departureAirportId: string;
     destinationAirportId: string;
-    classes: IFlightClassesDTO[];
+    classes: IFlightClassesDto[];
     departureTime: Date;
 }
 
@@ -28,4 +28,28 @@ export interface ICreateFlightResponseDto {
         type: string,
         id: string
     }[],
+}
+
+export interface IUpdateFlightDto {
+    flightId: string;
+    departureAirportId: string | undefined;
+    destinationAirportId: string | undefined;
+    departureTime: Date | undefined;
+    code: string | undefined;
+}
+
+export interface IUpdateFlightResponseDto {
+    departureTime: Date;
+    id: string;
+    code: string;
+    departureAirport: {
+        id: string;
+        name: string;
+        iataCode: string;
+    };
+    destinationAirport: {
+        id: string;
+        name: string;
+        iataCode: string;
+    };
 }
