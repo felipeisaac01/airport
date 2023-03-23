@@ -16,4 +16,8 @@ export class AirportRepository implements IAirportRepository {
 
         return airports
     }
+
+    async get(id: string) {
+        return this.client.airport.findUnique({ where: { id }})
+    }
 }
