@@ -56,8 +56,11 @@ export class FlightRepository implements IFlightRepository {
     }
 
     async get(id: string) {
-        return this.client.findUnique({ 
-            where: { id },
+        return this.client.findFirst({ 
+            where: { 
+                id, 
+                deletedAt: null 
+            },
             select: {
                 code: true,
                 departureTime: true,
@@ -126,6 +129,12 @@ export class FlightRepository implements IFlightRepository {
     }
 
     async checkIfCodeIsInUse(code: string, id: string) {
-        return this.client.findFirst({ where: { code, id: { not: id } } })
+        return this.client.findFirst({ 
+            where: { 
+                code, 
+                id: { not: id }, 
+                deletedAt: null 
+            } 
+        })
     }
 }

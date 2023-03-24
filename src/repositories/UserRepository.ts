@@ -8,6 +8,6 @@ export class UserRepository implements IUserRepository {
     }
 
     async get(username: string) {
-        return this.client.findFirst({ where: { username } });
+        return this.client.findFirst({ where: { username, deletedAt: null } });
     }
 }

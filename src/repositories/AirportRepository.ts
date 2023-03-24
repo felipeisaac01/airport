@@ -21,6 +21,6 @@ export class AirportRepository implements IAirportRepository {
     }
 
     async get(id: string) {
-        return this.client.findUnique({ where: { id }})
+        return this.client.findFirst({ where: { id, deletedAt: null }})
     }
 }
