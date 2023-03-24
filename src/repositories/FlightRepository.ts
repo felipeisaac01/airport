@@ -101,4 +101,5 @@ export class FlightRepository implements IFlightRepository {
             }
         })
     }
+            data: { status: "CANCELED" }
 }

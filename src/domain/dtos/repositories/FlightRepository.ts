@@ -72,3 +72,7 @@ export interface IUpdateFlightMethodResponseDto {
         id: string
     }
 }
+
+export interface ICancelFlightResponseDto {
+    status: string
+}

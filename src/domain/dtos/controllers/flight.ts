@@ -54,3 +54,11 @@ export interface IUpdateFlightResponseDto {
         iataCode: string;
     };
 }
+
+export interface ICancelFlightDto {
+    flightId: string
+}
+
+export interface ICancelFlightResponseDto {
+    status: string
+}

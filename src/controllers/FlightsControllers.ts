@@ -1,15 +1,14 @@
 import { Request, Response } from "express";
-import { ICreateFlightResponseDto, ICreateFlightDto, IUpdateFlightDto, IUpdateFlightResponseDto } from "../domain/dtos/controllers/flight";
+import { ICreateFlightResponseDto, ICreateFlightDto, IUpdateFlightDto, IUpdateFlightResponseDto, ICancelFlightDto, ICancelFlightResponseDto } from "../domain/dtos/controllers/flight";
 import { BadRequestError, NotFoundError } from "../errors/apiErrors";
 import { repositories } from "../repositories";
 import { generateFlightCode } from "../helpers/flightCode"
 import { bodyValidator } from "../helpers/bodyValidator";
-import { createFlightBodyValidator, updateFlightBodyValidator } from "../validator/flight";
+import { cancelFlightBodyValidator, createFlightBodyValidator, updateFlightBodyValidator } from "../validator/flight";
 
 export async function createFlight(req: Request<{}, {}, ICreateFlightDto>, res: Response<ICreateFlightResponseDto>) {
     bodyValidator(createFlightBodyValidator, req.body, "CF")
     const { departureAirportId, destinationAirportId, classes, departureTime } = req.body
-
 
     const departureAirport = await repositories.airport.get(departureAirportId);
     
@@ -119,4 +118,19 @@ export async function updateFlight(req: Request<{}, {}, IUpdateFlightDto>, res: 
     })
 
     return res.send(updatedFlight)
+}
+
+export async function cancelFlight(req: Request<{}, {}, ICancelFlightDto>, res: Response<ICancelFlightResponseDto>) {
+    bodyValidator(cancelFlightBodyValidator, req.body, "CLF")
+    const { flightId } = req.body;
+
+    const flight = await repositories.flight.get(flightId);
+
+    if (!flight) {
+        throw new NotFoundError("Flight not found.", "CLF-02")
+    }
+
+    const canceledFlight = await repositories.flight.cancel(flightId)
+
+    return res.send({ status: canceledFlight.status })
 }

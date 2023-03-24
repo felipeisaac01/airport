@@ -18,3 +18,7 @@ export const updateFlightBodyValidator = Joi.object({
     departureTime: Joi.date().greater("now"),
     code: Joi.string()
 })
+
+export const cancelFlightBodyValidator = Joi.object({
+    flightId: Joi.string().required()
+})
