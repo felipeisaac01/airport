@@ -1,11 +1,11 @@
 import { prismaClient } from "../prisma";
 import { AirportRepository } from "./AirportRepository";
-import { AdminRepository } from "./AdminRepository"
+import { UserRepository } from "./UserRepository"
 import { FlightRepository } from "./FlightRepository";
 import { FlightClassRepository } from "./FlightClassRepository";
 
 export const repositories = {
-    admin: new AdminRepository(prismaClient),
+    user: new UserRepository(prismaClient),
     airport: new AirportRepository(prismaClient),
     flight: new FlightRepository(prismaClient),
     flightClass: new FlightClassRepository(prismaClient)

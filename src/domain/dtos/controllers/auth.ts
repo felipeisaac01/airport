@@ -3,6 +3,12 @@ export interface ILoginRequestDto {
     password: string
 }
 
+export interface ILoginResponseDto {
+    token: string;
+}
+
 export interface IAuthTokenDto {
-    token: string
+    userId: string,
+    userPermission: "ADMIN" | "BUYER"
+    iat: number
 }

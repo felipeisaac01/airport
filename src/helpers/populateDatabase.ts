@@ -98,13 +98,26 @@ export async function populateDatabase() {
 
     }
 
-    const admin = await prismaClient.admin.findFirst({ where: { username: "originalAdmin" } })
+    const admin = await prismaClient.user.findFirst({ where: { username: "originalAdmin" } })
 
     if (!admin) {
-        await prismaClient.admin.create({
+        await prismaClient.user.create({
             data: {
                 password: await hashPassword("123456"),
-                username: "originalAdmin"
+                username: "originalAdmin",
+                role: 'ADMIN'
+            }
+        })
+    }
+
+    const buyer = await prismaClient.user.findFirst({ where: { username: "originalBuyer" } });
+
+    if (!buyer) {
+        await prismaClient.user.create({
+            data: {
+                password: await hashPassword("123456"),
+                username: "originalBuyer",
+                role: 'BUYER'
             }
         })
     }

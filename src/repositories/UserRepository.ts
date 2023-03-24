@@ -1,10 +1,10 @@
 import { PrismaClient } from "@prisma/client";
-import { IAdminRepository } from "../domain/interfaces/repositories/AdminRepository";
+import { IUserRepository } from "../domain/interfaces/repositories/UserRepository";
 
-export class AdminRepository implements IAdminRepository {
+export class UserRepository implements IUserRepository {
     private client;
     constructor(private prisma: PrismaClient) {
-        this.client = prisma.admin
+        this.client = prisma.user
     }
 
     async get(username: string) {

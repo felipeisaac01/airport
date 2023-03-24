@@ -10,15 +10,24 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Admin {
+enum UserRoles {
+  ADMIN
+  BUYER
+}
+
+model User {
   id        String    @id @default(uuid())
   createdAt DateTime  @default(now())
   updatedAt DateTime  @default(now()) @updatedAt
   deletedAt DateTime?
   username  String
   password  String
+  role      UserRoles
+  cpf       String?
+  email     String?
+  birthDate DateTime?
 
-  @@map("admins")
+  @@map("users")
 }
 
 enum federativeUnits {
