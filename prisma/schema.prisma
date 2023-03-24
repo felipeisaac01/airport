@@ -27,6 +27,7 @@ model User {
   email     String?
   birthDate DateTime?
 
+tickets Ticket[]
   @@map("users")
 }
 
@@ -108,5 +109,36 @@ model FlightClass {
   value     Int
   type      FlightClassOptions
 
+  tickets Ticket[]
   @@map("flight_classes")
+}
+
+model Ticket {
+  id        String             @id @default(uuid())
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @default(now()) @updatedAt
+  deletedAt DateTime?
+  number String @unique
+  name String
+  cpf String
+  birthdate DateTime
+  totalValue Int
+  flightClass FlightClass @relation(fields: [flightClassId], references: [id])
+  flightClassId String
+  buyerId String
+  buyer User @relation(fields: [buyerId], references: [id])
+  luggageId String?
+  luggage Luggage? 
+
+  @@map("tickets")
+}
+
+model Luggage {
+  id        String             @id @default(uuid())
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @default(now()) @updatedAt
+  deletedAt DateTime?
+  code String @unique
+  ticket Ticket @relation(fields: [ticketId], references: [id])
+  ticketId String @unique
 }
