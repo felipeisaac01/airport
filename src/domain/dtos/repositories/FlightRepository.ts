@@ -1,4 +1,4 @@
-import { FlightClassType } from "../controllers/FlightClasses";
+import { FlightClassType } from "../controllers/flight";
 
 export interface ICreateFlightMethodDto {
     code: string;

@@ -10,4 +10,8 @@ export class UserRepository implements IUserRepository {
     async get(username: string) {
         return this.client.findFirst({ where: { username, deletedAt: null } });
     }
+
+    async getById(id: string) {
+        return this.client.findFirst({ where: { id, deletedAt: null }})
+    }
 }
