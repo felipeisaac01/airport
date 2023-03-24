@@ -3,7 +3,7 @@ import { BadRequestError, NotFoundError } from "../errors/apiErrors";
 import { getTokeninfo } from "../helpers/auth";
 import { repositories } from "../repositories";
 import { isValid as validateCpf } from "@fnando/cpf"
-import { IPurchasedTicketDto, IPurchaseTicketDto } from "../domain/dtos/controllers/tickets";
+import { IPurchasedTicketDto, IPurchaseTicketDto } from "../domain/dtos/controllers/ticket";
 import { ICreateTicketItemMethodDto } from "../domain/dtos/repositories/TicketRepository";
 import { generateRandomCode } from "../helpers/randomCode";
 import { bodyValidator } from "../helpers/bodyValidator";

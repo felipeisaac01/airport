@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { IGetAirportResponseDTO } from "../domain/dtos/controllers/airports";
+import { IGetAirportResponseDTO } from "../domain/dtos/controllers/airport";
 import { repositories } from "../repositories";
 
 export async function getAirports(_req: Request, res: Response<IGetAirportResponseDTO[]>) {

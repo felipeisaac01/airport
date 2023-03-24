@@ -1,5 +1,5 @@
 import { Router } from "express"
-import { cancelFlight, createFlight, updateFlight } from "../controllers/FlightsControllers"
+import { cancelFlight, createFlight, updateFlight } from "../controllers/FlightControllers"
 import { authenticateAdmin } from "../middlewares/admin"
 
 const routes = Router()
