@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { ICreateFlightResponseDto, ICreateFlightDto, IUpdateFlightDto, IUpdateFlightResponseDto, ICancelFlightDto, ICancelFlightResponseDto } from "../domain/dtos/controllers/flight";
 import { BadRequestError, NotFoundError } from "../errors/apiErrors";
 import { repositories } from "../repositories";
-import { generateFlightCode } from "../helpers/flightCode"
+import { generateRandomCode } from "../helpers/randomCode"
 import { bodyValidator } from "../helpers/bodyValidator";
 import { cancelFlightBodyValidator, createFlightBodyValidator, updateFlightBodyValidator } from "../validator/flight";
 import { prismaClient } from "../prisma";
@@ -45,7 +45,7 @@ export async function createFlight(req: Request<{}, {}, ICreateFlightDto>, res: 
         destinationAirportId,
         departureAirportId,
         departureTime,
-        code: generateFlightCode(),
+        code: generateRandomCode(4, "NUMERIC"),
         classes
     })
 
