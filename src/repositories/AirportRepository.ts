@@ -2,10 +2,13 @@ import { PrismaClient } from "@prisma/client";
 import { IAirportRepository } from "../domain/interfaces/repositories/AirportRepository";
 
 export class AirportRepository implements IAirportRepository {
-    constructor(private client: PrismaClient) {}
+    private client
+    constructor(private prisma: PrismaClient) {
+        this.client = prisma.airport
+    }
 
     async getAll() {
-        const airports = this.client.airport.findMany({
+        const airports = this.client.findMany({
             where: {
                 deletedAt: null
             },
@@ -18,6 +21,6 @@ export class AirportRepository implements IAirportRepository {
     }
 
     async get(id: string) {
-        return this.client.airport.findUnique({ where: { id }})
+        return this.client.findUnique({ where: { id }})
     }
 }

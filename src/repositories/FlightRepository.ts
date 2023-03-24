@@ -4,11 +4,14 @@ import {  ICreateFlightMethodDto, ICreateFlightMethodResponseDto, IUpdateFlightM
 import { IFlightRepository } from "../domain/interfaces/repositories/FlightRepository";
 
 export class FlightRepository implements IFlightRepository {
-    constructor(private client: PrismaClient) {}
+    private client;
+    constructor(private prisma: PrismaClient) {
+        this.client = prisma.flight
+    }
 
     async createFlightWithClasses(data: ICreateFlightMethodDto): Promise<ICreateFlightMethodResponseDto> {
         const { classes, code, departureAirportId, departureTime, destinationAirportId } = data
-        return this.client.flight.create({ 
+        return this.client.create({ 
             data: {
                 code,
                 departureTime, 
@@ -25,6 +28,7 @@ export class FlightRepository implements IFlightRepository {
                 code: true,
                 createdAt: true,
                 departureTime: true,
+                status: true,
                 departureAirport: {
                     select: {
                         iataCode: true,
@@ -52,7 +56,7 @@ export class FlightRepository implements IFlightRepository {
     }
 
     async get(id: string) {
-        return this.client.flight.findUnique({ 
+        return this.client.findUnique({ 
             where: { id },
             select: {
                 code: true,
@@ -75,7 +79,7 @@ export class FlightRepository implements IFlightRepository {
     }
 
     async update(id: string, data: IUpdateFlightMethodDto) {
-        return this.client.flight.update({
+        return this.client.update({
             where: { id },
             data: {
                 ...data
@@ -101,5 +105,11 @@ export class FlightRepository implements IFlightRepository {
             }
         })
     }
+
+    async cancel(id: string) {
+        return this.client.update({
+            where: { id },
             data: { status: "CANCELED" }
+        })
+    }
 }

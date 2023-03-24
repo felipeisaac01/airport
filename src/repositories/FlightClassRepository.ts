@@ -1,11 +1,14 @@
 import { PrismaClient } from "@prisma/client";
-import { IFlightClassesDTO } from "../domain/dtos/controllers/FlightClasses";
+import { IFlightClassesDto } from "../domain/dtos/controllers/FlightClasses";
 import { IFlightClassRepository } from "../domain/interfaces/repositories/FlightClassRepository";
 
 export class FlightClassRepository implements IFlightClassRepository  {
-    constructor(private client: PrismaClient) {}
+    private client
+    constructor(private prisma: PrismaClient) {
+        this.client = prisma.flightClass
+    }
 
-    async create(data: IFlightClassesDTO) {
-        return this.client.flightClasses.create({ data })
+    async create(data: IFlightClassesDto) {
+        return this.client.create({ data })
     }
 }
