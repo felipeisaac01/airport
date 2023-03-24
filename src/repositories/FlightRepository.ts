@@ -64,16 +64,28 @@ export class FlightRepository implements IFlightRepository {
                 id: true,
                 departureAirport: {
                     select: {
+                        id: true,
                         cityId: true,
-                        id: true
+                        name: true,
+                        iataCode: true
                     }
                 },
                 destinationAirport: {
                     select: {
                         cityId: true,
-                        id: true
+                        id: true,
+                        name: true,
+                        iataCode: true
                     }
                 },
+                flightClasses: {
+                    select: {
+                        id: true,
+                        type: true,
+                        value: true,
+                        quantity: true
+                    }
+                }
             }
         })
     }
@@ -111,5 +123,9 @@ export class FlightRepository implements IFlightRepository {
             where: { id },
             data: { status: "CANCELED" }
         })
+    }
+
+    async checkIfCodeIsInUse(code: string, id: string) {
+        return this.client.findFirst({ where: { code, id: { not: id } } })
     }
 }

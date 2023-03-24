@@ -48,6 +48,10 @@ export interface IGetFlightMethodDto {
         cityId: string,
         id: string
     },
+    flightClasses:{
+        id: string;
+        type: string,
+    }[]
 }
 
 export interface IUpdateFlightMethodDto {

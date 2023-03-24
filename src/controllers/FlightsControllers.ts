@@ -5,6 +5,7 @@ import { repositories } from "../repositories";
 import { generateFlightCode } from "../helpers/flightCode"
 import { bodyValidator } from "../helpers/bodyValidator";
 import { cancelFlightBodyValidator, createFlightBodyValidator, updateFlightBodyValidator } from "../validator/flight";
+import { prismaClient } from "../prisma";
 
 export async function createFlight(req: Request<{}, {}, ICreateFlightDto>, res: Response<ICreateFlightResponseDto>) {
     bodyValidator(createFlightBodyValidator, req.body, "CF")
@@ -53,7 +54,7 @@ export async function createFlight(req: Request<{}, {}, ICreateFlightDto>, res: 
 
 export async function updateFlight(req: Request<{}, {}, IUpdateFlightDto>, res: Response<IUpdateFlightResponseDto>) {
     bodyValidator(updateFlightBodyValidator, req.body, "UF")
-    const { flightId, departureAirportId, departureTime, destinationAirportId,code } = req.body;
+    const { flightId, departureAirportId, departureTime, destinationAirportId, code, classes } = req.body;
 
     const flight = await repositories.flight.get(flightId);
 
@@ -111,17 +112,117 @@ export async function updateFlight(req: Request<{}, {}, IUpdateFlightDto>, res: 
         }
     }
 
-    if (departureTime && departureTime <= new Date()) {
+    if (code) {
+        const existingFlightWithCode = await repositories.flight.checkIfCodeIsInUse(code, flightId);
 
-        throw new BadRequestError("Departure time must be a future moment.", "UF-13");
+        if (existingFlightWithCode) {
+            throw new BadRequestError("Given code already in use", "UF-13")
+        }
     }
 
-    const updatedFlight = await repositories.flight.update(flightId, { 
-        code, 
-        departureAirportId, 
-        departureTime, 
-        destinationAirportId 
-    })
+    const necessaryDatabaseCalls = []
+
+    necessaryDatabaseCalls.push(prismaClient.flight.update({
+        where: { id:flightId },
+        data: {
+            code,
+            departureAirportId,
+            destinationAirportId,
+            departureTime,
+        },
+        select: {
+            code: true,
+            departureTime: true,
+            id: true,
+            departureAirport: {
+                select: {
+                    iataCode: true,
+                    name: true,
+                    id: true
+                }
+            },
+            destinationAirport: {
+                select: {
+                    iataCode: true,
+                    name: true,
+                    id: true
+                }
+            },
+        }
+    }))
+
+    if (classes) {
+        if (!classes.length) {
+            throw new BadRequestError("Flights must have at least one class", "UF-14")
+        }
+
+        for (const flightClass of classes) {
+            if (classes.filter(item => item.type === flightClass.type).length > 1) {
+                throw new BadRequestError("There can not be two classes with the same type", "UF-15")
+            }
+        }
+
+        const classesToUpdate = [];
+        const classesToCreate = [];
+        let classesToDelete = flight.flightClasses;
+    
+    
+        // TODO adicionar lógica para verificar se existem mais passagens compradas do que
+        // TODO novo valor de quantidade de assentos
+        for (const flightClass of classes) {
+            const [existingClass] = flight.flightClasses.filter(item => item.type === flightClass.type)
+
+            if (existingClass) {
+                classesToUpdate.push({
+                    id: existingClass.id,
+                    ...flightClass
+                })
+                classesToDelete = classesToDelete.filter(item => item.type !== flightClass.type)
+                continue
+            }
+
+            classesToCreate.push({ flightId, ...flightClass})
+        }
+
+        if (classesToCreate.length) {
+            necessaryDatabaseCalls.push(
+                prismaClient.flightClass.createMany({
+                    data: classesToCreate
+                })
+            )
+        }
+    
+        if (classesToUpdate.length) {
+            for (const classToUpdate of classesToUpdate) {
+                necessaryDatabaseCalls.push(
+                    prismaClient.flightClass.update({
+                        where: { id: classToUpdate.id },
+                        data: {
+                            quantity: classToUpdate.quantity,
+                            value: classToUpdate.value,
+                        }
+                    })
+                )
+            }
+        }
+    
+        if (classesToDelete.length) {
+            necessaryDatabaseCalls.push(
+                prismaClient.flightClass.deleteMany({
+                    where: {
+                         id: { 
+                            in: classesToDelete.map(item => item.id ) 
+                        } 
+                    }
+                })
+            )
+        }
+    }
+
+    await prismaClient.$transaction(necessaryDatabaseCalls)
+
+
+    const updatedFlight = (await repositories.flight.get(flightId))!
 
     return res.send(updatedFlight)
 }

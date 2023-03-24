@@ -1,4 +1,4 @@
-import { IFlightClassesDto } from "./FlightClasses";
+import { FlightClassType, IFlightClassesDto } from "./FlightClasses";
 
 export interface ICreateFlightDto {
     departureAirportId: string;
@@ -31,12 +31,19 @@ export interface ICreateFlightResponseDto {
     }[],
 }
 
+export interface IUpdateFlightClassDto {
+    quantity: number;
+    value: number,
+    type: FlightClassType
+}
+
 export interface IUpdateFlightDto {
     flightId: string;
     departureAirportId: string | undefined;
     destinationAirportId: string | undefined;
     departureTime: Date | undefined;
     code: string | undefined;
+    classes: IUpdateFlightClassDto[] | undefined;
 }
 
 export interface IUpdateFlightResponseDto {
@@ -47,12 +54,19 @@ export interface IUpdateFlightResponseDto {
         id: string;
         name: string;
         iataCode: string;
+        cityId: string;
     };
     destinationAirport: {
         id: string;
         name: string;
         iataCode: string;
     };
+    flightClasses: {
+        id: string,
+        type: string,
+        value: number,
+        quantity: number
+    }[]
 }
 
 export interface ICancelFlightDto {
