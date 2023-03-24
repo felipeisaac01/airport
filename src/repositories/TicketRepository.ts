@@ -6,4 +6,12 @@ export class TicketRepository implements ITicketRepository {
     constructor(private prisma: PrismaClient) {
         this.client = prisma.ticket
     }
+
+    async getCountByClass(flightClassId: string) {
+        return this.client.count({
+            where: {
+                flightClassId 
+            }
+        })
+    }
 }

@@ -194,6 +194,15 @@ export async function updateFlight(req: Request<{}, {}, IUpdateFlightDto>, res: 
     
         if (classesToUpdate.length) {
             for (const classToUpdate of classesToUpdate) {
+                const ticketsSold = await repositories.ticket.getCountByClass(classToUpdate.id);
+
+                if (ticketsSold > classToUpdate.quantity) {
+                    throw new BadRequestError(
+                        `There are more tickets sold to the ${classToUpdate.type} class than the new value for quantity.`,
+                        "UF-16"
+                    )
+                }
+
                 necessaryDatabaseCalls.push(
                     prismaClient.flightClass.update({
                         where: { id: classToUpdate.id },
