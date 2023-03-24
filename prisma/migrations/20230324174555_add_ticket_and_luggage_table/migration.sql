@@ -4,7 +4,7 @@ CREATE TABLE "tickets" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "deletedAt" TIMESTAMP(3),
-    "number" TEXT NOT NULL,
+    "code" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "cpf" TEXT NOT NULL,
     "birthdate" TIMESTAMP(3) NOT NULL,
@@ -28,7 +28,7 @@ CREATE TABLE "Luggage" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "tickets_number_key" ON "tickets"("number");
+CREATE UNIQUE INDEX "tickets_code_key" ON "tickets"("code");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Luggage_code_key" ON "Luggage"("code");
