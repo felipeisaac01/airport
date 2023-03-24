@@ -24,10 +24,11 @@ model User {
   password  String
   role      UserRoles
   cpf       String?
-  email     String?
+  name      String?
   birthDate DateTime?
 
-tickets Ticket[]
+  tickets Ticket[]
+
   @@map("users")
 }
 
@@ -114,31 +115,30 @@ model FlightClass {
 }
 
 model Ticket {
-  id        String             @id @default(uuid())
-  createdAt DateTime           @default(now())
-  updatedAt DateTime           @default(now()) @updatedAt
-  deletedAt DateTime?
-  number String @unique
-  name String
-  cpf String
-  birthdate DateTime
-  totalValue Int
-  flightClass FlightClass @relation(fields: [flightClassId], references: [id])
+  id            String      @id @default(uuid())
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @default(now()) @updatedAt
+  deletedAt     DateTime?
+  number        String      @unique
+  name          String
+  cpf           String
+  birthdate     DateTime
+  totalValue    Int
+  flightClass   FlightClass @relation(fields: [flightClassId], references: [id])
   flightClassId String
-  buyerId String
-  buyer User @relation(fields: [buyerId], references: [id])
-  luggageId String?
-  luggage Luggage? 
+  buyerId       String
+  buyer         User        @relation(fields: [buyerId], references: [id])
+  luggage       Luggage?
 
   @@map("tickets")
 }
 
 model Luggage {
-  id        String             @id @default(uuid())
-  createdAt DateTime           @default(now())
-  updatedAt DateTime           @default(now()) @updatedAt
+  id        String    @id @default(uuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now()) @updatedAt
   deletedAt DateTime?
-  code String @unique
-  ticket Ticket @relation(fields: [ticketId], references: [id])
-  ticketId String @unique
+  code      String    @unique
+  ticket    Ticket    @relation(fields: [ticketId], references: [id])
+  ticketId  String    @unique
 }

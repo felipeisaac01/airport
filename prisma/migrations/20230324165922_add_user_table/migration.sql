@@ -11,7 +11,7 @@ CREATE TABLE "users" (
     "password" TEXT NOT NULL,
     "role" "UserRoles" NOT NULL,
     "cpf" TEXT,
-    "email" TEXT,
+    "name" TEXT,
     "birthDate" TIMESTAMP(3),
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")

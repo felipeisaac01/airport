@@ -11,7 +11,6 @@ CREATE TABLE "tickets" (
     "totalValue" INTEGER NOT NULL,
     "flightClassId" TEXT NOT NULL,
     "buyerId" TEXT NOT NULL,
-    "luggageId" TEXT,
 
     CONSTRAINT "tickets_pkey" PRIMARY KEY ("id")
 );
