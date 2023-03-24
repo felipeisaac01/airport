@@ -1,4 +1,17 @@
-import { FlightClassType, IFlightClassesDto } from "./FlightClasses";
+export enum FlightClassType {
+    A = "A",
+    B = "B",
+    C = "C",
+    D = "D",
+    E = "E",
+}
+
+export interface IFlightClassesDto {
+    quantity: number;
+    value: number,
+    flightId: string;
+    type: FlightClassType
+}
 
 export interface ICreateFlightDto {
     departureAirportId: string;
