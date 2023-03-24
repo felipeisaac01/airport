@@ -30,20 +30,39 @@ export class TicketRepository implements ITicketRepository {
                         }
                     } : undefined
                 },
-                include: {
-                    buyer: true,
+                select: {
+                    birthdate: true,
+                    code: true,
+                    cpf: true,
+                    id:true,
+                    name:true,
+                    luggage: {
+                        select: {
+                            code:true
+                        }
+                    },
                     flightClass: {
-                        include: {
+                        select: {
+                            type: true,
                             flight: {
-                                include: {
-                                    departureAirport: true,
-                                    destinationAirport: true
+                                select: {
+                                    departureTime: true,
+                                    code: true,
+                                    departureAirport: {
+                                        select: {
+                                            iataCode: true,
+                                        }
+                                    },
+                                    destinationAirport: {
+                                        select: {
+                                            iataCode: true
+                                        }
+                                    }
                                 }
                             }
                         }
-                    },
-                    luggage: true
-                }
+                    }
+                },
              }))
         }
 

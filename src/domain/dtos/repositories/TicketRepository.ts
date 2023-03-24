@@ -1,3 +1,5 @@
+import { FlightClassOptions } from "@prisma/client";
+
 export interface ICreateTicketItemMethodDto {
     flightClassId: string;
     buyerId: string;
@@ -7,4 +9,28 @@ export interface ICreateTicketItemMethodDto {
     code: string;
     totalValue: number;
     luggage: string | undefined;
+}
+
+export interface ICreateTicketItemMethodResponseDto {
+    id: string;
+    code: string;
+    name: string;
+    cpf: string;
+    birthdate: Date;
+    flightClass: {
+        type: FlightClassOptions;
+        flight: {
+            code: string;
+            departureTime: Date;
+            departureAirport: {
+                iataCode: string;
+            };
+            destinationAirport: {
+                iataCode: string;
+            };
+        };
+    };
+    luggage: {
+        code: string;
+    } | null;
 }
