@@ -32,6 +32,12 @@ export async function createFlight(req: Request<{}, {}, ICreateFlightDto>, res: 
 
     if (!classes.length) {
         throw new BadRequestError("Flight must have at least one class.", "CF-06")
+    } else if (classes.length > 1) {
+        for (const flightClass of classes) {
+            if (classes.filter(item => item.type === flightClass.type).length > 1) {
+                throw new BadRequestError("There can not be more the one class of a type in a flight.", "CF-07")
+            } 
+        }
     }
 
     const flight = await repositories.flight.createFlightWithClasses({ 
