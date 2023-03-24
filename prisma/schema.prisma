@@ -75,7 +75,7 @@ model Flight {
   destinationAirportId String
   status               FlightStatus @default(CONFIRMED)
 
-  flightClasses FlightClasses[]
+  flightClasses FlightClass[]
 
   @@map("flights")
 }
@@ -88,7 +88,7 @@ enum FlightClassOptions {
   E
 }
 
-model FlightClasses {
+model FlightClass {
   id        String             @id @default(uuid())
   createdAt DateTime           @default(now())
   updatedAt DateTime           @default(now()) @updatedAt
