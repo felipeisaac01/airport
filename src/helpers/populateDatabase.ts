@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { hashPassword } from "./crypt";
+import { generate } from "@fnando/cpf"
 
 export async function populateDatabase() {
     const prismaClient = new PrismaClient()
@@ -117,7 +118,11 @@ export async function populateDatabase() {
             data: {
                 password: await hashPassword("123456"),
                 username: "originalBuyer",
-                role: 'BUYER'
+                role: 'BUYER',
+                birthDate: new Date(),
+                cpf: "000.000.000-000",
+                email: "original@buyer.com",
+                name: "original buyer",
             }
         })
     }

@@ -26,6 +26,7 @@ model User {
   cpf       String?
   name      String?
   birthDate DateTime?
+  email     String?
 
   tickets Ticket[]
 
@@ -111,6 +112,7 @@ model FlightClass {
   type      FlightClassOptions
 
   tickets Ticket[]
+
   @@map("flight_classes")
 }
 
@@ -119,7 +121,7 @@ model Ticket {
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @default(now()) @updatedAt
   deletedAt     DateTime?
-  code        String      @unique
+  code          String      @unique
   name          String
   cpf           String
   birthdate     DateTime
