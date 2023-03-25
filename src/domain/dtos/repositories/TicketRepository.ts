@@ -34,3 +34,8 @@ export interface ICreateTicketItemMethodResponseDto {
         code: string;
     } | null;
 }
+
+export interface IGetTicketCountByclassesIds {
+    flightClassId: string;
+    count: { flightClassId: string }
+}

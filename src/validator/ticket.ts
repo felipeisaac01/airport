@@ -10,3 +10,11 @@ export const purchaseTicketBodyValidator = Joi.object({
         luggage: Joi.bool().required()
     }))
 })
+
+export const getTicketsForPurchaseQueryValidator = Joi.object({
+    departureAirportCode: Joi.string().required(),
+    destinationAirportCode: Joi.string().required(),
+    date: Joi.date(),
+    minValue: Joi.string(),
+    maxValue: Joi.string(),
+})

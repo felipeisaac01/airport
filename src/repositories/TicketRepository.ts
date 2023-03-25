@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { ICreateTicketItemMethodDto } from "../domain/dtos/repositories/TicketRepository";
+import { ICreateTicketItemMethodDto, IGetTicketCountByclassesIds } from "../domain/dtos/repositories/TicketRepository";
 import { ITicketRepository } from "../domain/interfaces/repositories/TicketRepository";
 
 export class TicketRepository implements ITicketRepository {
@@ -67,5 +67,18 @@ export class TicketRepository implements ITicketRepository {
         }
 
         return this.prisma.$transaction(prismaPromises)
+    }
+
+    async getTicketCountByclassesIds(flightClassesIds: string[])  {
+        return this.client.groupBy({
+            by: ["flightClassId"],
+            where: {
+                deletedAt: null,
+                flightClassId: { in: flightClassesIds },
+            },
+            _count: {
+                id: true
+            }
+        })
     }
 }

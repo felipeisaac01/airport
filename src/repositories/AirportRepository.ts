@@ -23,4 +23,13 @@ export class AirportRepository implements IAirportRepository {
     async get(id: string) {
         return this.client.findFirst({ where: { id, deletedAt: null }})
     }
+
+    async getByCode(iataCode: string) {
+        return this.client.findFirst({
+            where: {
+                iataCode,
+                deletedAt: null
+            }
+        })
+    }
 }

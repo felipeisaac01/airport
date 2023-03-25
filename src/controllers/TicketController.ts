@@ -3,11 +3,11 @@ import { BadRequestError, NotFoundError } from "../errors/apiErrors";
 import { getTokeninfo } from "../helpers/auth";
 import { repositories } from "../repositories";
 import { isValid as validateCpf } from "@fnando/cpf"
-import { IPurchasedTicketDto, IPurchaseTicketDto } from "../domain/dtos/controllers/ticket";
+import { IGetAvailableTicketsForPurchaseResponseDto, IGetTicketsForPurchaseParamsDto, IPurchasedTicketDto, IPurchaseTicketDto } from "../domain/dtos/controllers/ticket";
 import { ICreateTicketItemMethodDto } from "../domain/dtos/repositories/TicketRepository";
 import { generateRandomCode } from "../helpers/randomCode";
 import { bodyValidator } from "../helpers/bodyValidator";
-import { purchaseTicketBodyValidator } from "../validator/ticket";
+import { getTicketsForPurchaseQueryValidator, purchaseTicketBodyValidator } from "../validator/ticket";
 
 export async function purchaseTicket(req: Request<{}, {}, IPurchaseTicketDto>, res: Response<IPurchasedTicketDto[]>) {
     bodyValidator(purchaseTicketBodyValidator, req.body, "PT")
@@ -70,4 +70,74 @@ export async function purchaseTicket(req: Request<{}, {}, IPurchaseTicketDto>, r
             }
         }
     }))
+}
+
+export async function getAvailableTicketsForPurchase(
+    req: Request<{}, {}, {}, IGetTicketsForPurchaseParamsDto>, 
+    res: Response<IGetAvailableTicketsForPurchaseResponseDto[]>
+) {
+    bodyValidator(getTicketsForPurchaseQueryValidator, req.query, "GTP")
+    const { departureAirportCode, destinationAirportCode } = req.query; 
+    const dateString = req.query.date
+    const maxValue = req.query.maxValue ? parseInt(req.query.maxValue) : undefined
+    const minValue = req.query.minValue ? parseInt(req.query.minValue) : undefined
+
+    const departureAirport = await repositories.airport.getByCode(departureAirportCode)
+
+    if (!departureAirport) {
+        throw new NotFoundError("Departure airport not found.", "GTP-02")
+    }
+
+    const destinationAirport = await repositories.airport.getByCode(destinationAirportCode)
+
+    if (!destinationAirport) {
+        throw new NotFoundError("Destination airport not found.", "GTP-03")
+    }
+
+    const date = dateString ? new Date(dateString) : undefined
+
+    if (date && isNaN(date.valueOf())) {
+        throw new BadRequestError("Given date is not valid.", "GTP-04")
+    }
+
+    if (maxValue) {
+        if (isNaN(maxValue)) {
+            throw new BadRequestError("maxValue must be a number", "GTP-05")
+        }
+
+        if (maxValue <= 0) {
+            throw new BadRequestError("maxValue must be greater than zero.", "GTP-06")
+        }
+    }
+
+    if (minValue) {
+        if (isNaN(minValue)) {
+            throw new BadRequestError("minValue must be a number", "GTP-07")
+        }
+
+        if (minValue < 0) {
+            throw new BadRequestError("minValue must be, at least, zero.", "GTP-08")
+        }
+    }
+
+    const filteredClasses = await repositories.flightClass.getFilteredClassesForPurchase({
+        date,
+        departureAirportCode,
+        destinationAirportCode,
+        maxValue,
+        minValue
+    })
+
+    const ticketsSold = await repositories.ticket.getTicketCountByclassesIds(filteredClasses.map(item => item.id));
+    
+    const availableClasses = [];
+
+    for (const flightClass of filteredClasses) {
+        const flightClassCount = ticketsSold.find(item => item.flightClassId === flightClass.id)
+        if (!flightClass || (flightClassCount && flightClassCount._count.id < flightClass.quantity)) {
+            availableClasses.push(flightClass)
+        }
+    }
+
+    return res.send(availableClasses)
 }
