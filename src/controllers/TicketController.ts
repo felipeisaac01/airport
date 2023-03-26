@@ -8,6 +8,7 @@ import { ICreateTicketItemMethodDto } from "../domain/dtos/repositories/TicketRe
 import { generateRandomCode } from "../helpers/randomCode";
 import { bodyValidator } from "../helpers/bodyValidator";
 import { getTicketsForPurchaseQueryValidator, purchaseTicketBodyValidator } from "../validator/ticket";
+import { isPast } from "date-fns";
 
 export async function purchaseTicket(req: Request<{}, {}, IPurchaseTicketDto>, res: Response<IPurchasedTicketDto[]>) {
     bodyValidator(purchaseTicketBodyValidator, req.body, "PT")
@@ -96,27 +97,34 @@ export async function getAvailableTicketsForPurchase(
 
     const date = dateString ? new Date(dateString) : undefined
 
-    if (date && isNaN(date.valueOf())) {
-        throw new BadRequestError("Given date is not valid.", "GTP-04")
+    if (date) {
+        if (isNaN(date.valueOf())) {
+            throw new BadRequestError("Given date is not valid.", "GTP-04")
+        }
+
+        if (isPast(date)) {
+            throw new BadRequestError("Given date mus be in the future", "GTP-05")
+        }
     }
+
 
     if (maxValue) {
         if (isNaN(maxValue)) {
-            throw new BadRequestError("maxValue must be a number", "GTP-05")
+            throw new BadRequestError("maxValue must be a number", "GTP-06")
         }
 
         if (maxValue <= 0) {
-            throw new BadRequestError("maxValue must be greater than zero.", "GTP-06")
+            throw new BadRequestError("maxValue must be greater than zero.", "GTP-07")
         }
     }
 
     if (minValue) {
         if (isNaN(minValue)) {
-            throw new BadRequestError("minValue must be a number", "GTP-07")
+            throw new BadRequestError("minValue must be a number", "GTP-08")
         }
 
         if (minValue < 0) {
-            throw new BadRequestError("minValue must be, at least, zero.", "GTP-08")
+            throw new BadRequestError("minValue must be, at least, zero.", "GTP-09")
         }
     }
 
@@ -128,8 +136,9 @@ export async function getAvailableTicketsForPurchase(
         minValue
     })
 
+    // TODO verificar essa query melhor
     const ticketsSold = await repositories.ticket.getTicketCountByclassesIds(filteredClasses.map(item => item.id));
-    
+    console.log({ticketsSold})
     const availableClasses = [];
 
     for (const flightClass of filteredClasses) {
