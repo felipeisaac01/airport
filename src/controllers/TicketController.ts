@@ -3,43 +3,49 @@ import { BadRequestError, NotFoundError } from "../errors/apiErrors";
 import { getTokeninfo } from "../helpers/auth";
 import { repositories } from "../repositories";
 import { isValid as validateCpf } from "@fnando/cpf"
-import { IGetAvailableTicketsForPurchaseResponseDto, IGetTicketsForPurchaseParamsDto, IPurchasedTicketDto, IPurchaseTicketDto } from "../domain/dtos/controllers/ticket";
+import { 
+    IGetAvailableTicketsForPurchaseResponseDto, 
+    IGetTicketsForPurchaseParamsDto, 
+    IPurchasedTicketDto, 
+    IPurchaseTicketDto 
+} from "../domain/dtos/controllers/ticket";
 import { ICreateTicketItemMethodDto } from "../domain/dtos/repositories/TicketRepository";
 import { generateRandomCode } from "../helpers/randomCode";
 import { bodyValidator } from "../helpers/bodyValidator";
 import { getTicketsForPurchaseQueryValidator, purchaseTicketBodyValidator } from "../validator/ticket";
 import { isPast } from "date-fns";
 
-export async function purchaseTicket(req: Request<{}, {}, IPurchaseTicketDto>, res: Response<IPurchasedTicketDto[]>) {
-    bodyValidator(purchaseTicketBodyValidator, req.body, "PT")
-    const { flightId,classType, passengers } = req.body
-    const { userId } = await getTokeninfo(req.headers.authorization!)
+export async function purchaseTicket(req: Request<{ flightId: string }, {}, IPurchaseTicketDto>, res: Response<IPurchasedTicketDto[]>) {
+    bodyValidator(purchaseTicketBodyValidator, req.body, "PT");
+    const { classType, passengers } = req.body;
+    const { flightId } = req.params;
+    const { userId } = await getTokeninfo(req.headers.authorization!);
 
     const user = (await repositories.user.getById(userId))!;
 
-    const flight = await repositories.flight.get(flightId)
+    const flight = await repositories.flight.get(flightId);
 
     if (!flight) {
-        throw new NotFoundError("Flight not found.", "PT-02")
+        throw new NotFoundError("Flight not found.", "PT-02");
     }
 
-    const flightClass = await repositories.flightClass.getByFlightAndType(flightId, classType) 
+    const flightClass = await repositories.flightClass.getByFlightAndType(flightId, classType);
 
     if (!flightClass) {
-        throw new NotFoundError("Flight class not found.", "PT-03")
+        throw new NotFoundError("Flight class not found.", "PT-03");
     }
 
-    const classExistingTickets = await repositories.ticket.getCountByClass(flightClass.id)
+    const classExistingTickets = await repositories.ticket.getCountByClass(flightClass.id);
 
     if (flightClass.quantity < classExistingTickets + passengers.length) {
-        throw new BadRequestError("Flight class capacity already reached.", "PT-04")
+        throw new BadRequestError("Flight class capacity already reached.", "PT-04");
     }
 
-    const ticketsToBeCreated: ICreateTicketItemMethodDto[] = []
+    const ticketsToBeCreated: ICreateTicketItemMethodDto[] = [];
 
     for (const passenger of passengers) {
         if (!validateCpf(passenger.cpf)) {
-            throw new BadRequestError(`${passenger.name}'s CPF is not valid`, "PT-05")
+            throw new BadRequestError(`${passenger.name}'s CPF is not valid`, "PT-05");;
         }
 
         ticketsToBeCreated.push({
@@ -49,9 +55,10 @@ export async function purchaseTicket(req: Request<{}, {}, IPurchaseTicketDto>, r
             buyerId: user.id,
             totalValue: passenger.luggage ? Math.round(flightClass.value*1.1) : flightClass.value,
             code: generateRandomCode(6, "ALPHANUMERIC")
-        })
+        });
     }
-    const ticketsCreated = await repositories.ticket.createTickets(ticketsToBeCreated)
+
+    const ticketsCreated = await repositories.ticket.createTickets(ticketsToBeCreated);
 
     return res.status(201).send(ticketsCreated.map(ticket => {
         return {
@@ -70,7 +77,7 @@ export async function purchaseTicket(req: Request<{}, {}, IPurchaseTicketDto>, r
                 code: ticket.flightClass.flight.code
             }
         }
-    }))
+    }));
 }
 
 export async function getAvailableTicketsForPurchase(

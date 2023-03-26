@@ -3,7 +3,6 @@ import { ParsedQs } from "qs";
 import { FlightClassType } from "./flight";
 
 export interface IPurchaseTicketDto {
-    flightId: string;
     classType: FlightClassType;
     passengers: {
         cpf: string,

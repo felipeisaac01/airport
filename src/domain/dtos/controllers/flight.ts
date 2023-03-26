@@ -51,7 +51,6 @@ export interface IUpdateFlightClassDto {
 }
 
 export interface IUpdateFlightDto {
-    flightId: string;
     departureAirportId: string | undefined;
     destinationAirportId: string | undefined;
     departureTime: Date | undefined;
@@ -80,10 +79,6 @@ export interface IUpdateFlightResponseDto {
         value: number,
         quantity: number
     }[]
-}
-
-export interface ICancelFlightDto {
-    flightId: string
 }
 
 export interface ICancelFlightResponseDto {
