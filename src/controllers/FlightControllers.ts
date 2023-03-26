@@ -4,7 +4,8 @@ import {
     ICreateFlightDto, 
     IUpdateFlightDto, 
     IUpdateFlightResponseDto,
-    ICancelFlightResponseDto
+    ICancelFlightResponseDto,
+    IGetFlightsResponseDto
 } from "../domain/dtos/controllers/flight";
 import { BadRequestError, NotFoundError } from "../errors/apiErrors";
 import { repositories } from "../repositories";
@@ -256,4 +257,10 @@ export async function cancelFlight(req: Request<{ flightId: string }>, res: Resp
     const canceledFlight = await repositories.flight.cancel(flightId)
 
     return res.send({ status: canceledFlight.status })
+}
+
+export async function getFlights(req: Request, res: Response<IGetFlightsResponseDto[]>) {
+    const flights = await repositories.flight.getFlights();
+
+    return res.send(flights)
 }

@@ -84,3 +84,21 @@ export interface IUpdateFlightResponseDto {
 export interface ICancelFlightResponseDto {
     status: string
 }
+
+export interface IGetFlightsResponseDto {
+    id: string;
+    createdAt: Date;
+    updatedAt: Date;
+    deletedAt: Date | null;
+    departureTime: Date;
+    code: string;
+    status: "CANCELED" | "CONFIRMED";
+    departureAirport: {
+        id: string;
+        iataCode: string;
+    };
+    destinationAirport: {
+        id: string;
+        iataCode: string;
+    };
+}

@@ -137,4 +137,27 @@ export class FlightRepository implements IFlightRepository {
             } 
         })
     }
+
+    async getFlights() {
+        return this.client.findMany({
+            where: {
+                deletedAt: null,
+                departureTime: { gte: new Date() },
+            },
+            include: {
+                departureAirport: {
+                    select: {
+                        id: true,
+                        iataCode: true
+                    }
+                },
+                destinationAirport: {
+                    select: {
+                        id: true,
+                        iataCode: true
+                    }
+                }
+            }
+        })
+    }
 }
