@@ -143,14 +143,12 @@ export async function getAvailableTicketsForPurchase(
         minValue
     })
 
-    // TODO verificar essa query melhor
     const ticketsSold = await repositories.ticket.getTicketCountByclassesIds(filteredClasses.map(item => item.id));
-    console.log({ticketsSold})
     const availableClasses = [];
 
     for (const flightClass of filteredClasses) {
         const flightClassCount = ticketsSold.find(item => item.flightClassId === flightClass.id)
-        if (!flightClass || (flightClassCount && flightClassCount._count.id < flightClass.quantity)) {
+        if (!flightClassCount || (flightClassCount && flightClassCount._count.id < flightClass.quantity)) {
             availableClasses.push(flightClass)
         }
     }
