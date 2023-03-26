@@ -160,19 +160,14 @@ export async function getAvailableTicketsForPurchase(
 
 export async function emitTicket(req: Request<{ ticketId: string }>, res: Response<IEmitTicketResponseDto>) {
     const { ticketId } = req.params
-    // console.log({ticketId})
     
     const ticket = await repositories.ticket.getTicketById(ticketId);
-    // console.log({ticket})
     
     if (!ticket) {
         throw new NotFoundError("Ticket not found.", "ET-01")
     }
     
     const emissionInfo = (await repositories.ticket.getEmissionInfoByTicketId(ticketId))!
-    
-
-    console.log({emissionInfo})
 
     if (new Date() < subHours(emissionInfo.flightClass.flight.departureTime, 5)) {
         throw new BadRequestError("You can only emit tickets 5 hours before departure time.", "ET-02")
