@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { endOfDay, startOfDay } from "date-fns";
 import { FlightClassType } from "../domain/dtos/controllers/flight";
-import { IGetFilteredClassesForPurchaseDto } from "../domain/dtos/repositories/FlightClassRepository";
+import { ICreateMethodDto, IGetFilteredClassesForPurchaseDto, IUpdateMethodDto } from "../domain/dtos/repositories/FlightClassRepository";
 import { IFlightClassRepository } from "../domain/interfaces/repositories/FlightClassRepository";
 
 export class FlightClassRepository implements IFlightClassRepository  {
@@ -64,6 +64,17 @@ export class FlightClassRepository implements IFlightClassRepository  {
                     }
                 }
             }
+        })
+    }
+
+    async create(data: ICreateMethodDto) {
+        return this.client.create({ data })
+    }
+
+    async update(data: IUpdateMethodDto) {
+        return this.client.update({
+            where: { id: data.id },
+            data
         })
     }
 }

@@ -175,9 +175,6 @@ export async function updateFlight(req: Request<{ flightId: string }, {} , IUpda
         const classesToCreate = [];
         let classesToDelete = flight.flightClasses;
     
-    
-        // TODO adicionar lógica para verificar se existem mais passagens compradas do que
-        // TODO novo valor de quantidade de assentos
         for (const flightClass of classes) {
             const [existingClass] = flight.flightClasses.filter(item => item.type === flightClass.type)
 

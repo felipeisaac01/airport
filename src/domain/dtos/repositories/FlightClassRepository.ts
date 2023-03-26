@@ -19,3 +19,16 @@ export interface IGetFilteredClassesForPurchaseResponseDto {
         departureTime: Date;
     };
 }
+
+export interface ICreateMethodDto {
+    quantity: number,
+    value: number,
+    flightId: string;
+    type: FlightClassOptions
+}
+
+export interface IUpdateMethodDto {
+    quantity: number | undefined,
+    value: number | undefined,
+    id: string;
+}
