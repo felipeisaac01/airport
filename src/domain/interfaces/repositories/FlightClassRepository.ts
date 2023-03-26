@@ -1,7 +1,9 @@
 import { FlightClass } from "@prisma/client";
 import { FlightClassType } from "../../dtos/controllers/flight";
+import { IGetFilteredClassesForPurchaseDto, IGetFilteredClassesForPurchaseResponseDto } from "../../dtos/repositories/FlightClassRepository";
 
 export interface IFlightClassRepository {
     get: (id: string) => Promise<FlightClass | null>,
     getByFlightAndType: (flightId: string, type: FlightClassType) =>Promise<FlightClass | null>
+    getFilteredClassesForPurchase: (data: IGetFilteredClassesForPurchaseDto) => Promise<IGetFilteredClassesForPurchaseResponseDto[]>
 }

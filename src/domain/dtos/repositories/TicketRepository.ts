@@ -1,4 +1,4 @@
-import { FlightClassOptions } from "@prisma/client";
+import { FlightClassOptions, Luggage } from "@prisma/client";
 
 export interface ICreateTicketItemMethodDto {
     flightClassId: string;
@@ -38,4 +38,25 @@ export interface ICreateTicketItemMethodResponseDto {
 export interface IGetTicketCountByclassesIds {
     flightClassId: string;
     count: { flightClassId: string }
+}
+
+export interface IGetEmissionInfoByTicketIdResponseDto {
+    cpf: string;
+    birthdate: Date;
+    name: string;
+    luggage: Luggage | null;
+    code: string;
+    flightClass: {
+        type: FlightClassOptions;
+        flight: {
+            code: string;
+            departureTime: Date;
+            departureAirport: {
+                iataCode: string;
+            };
+            destinationAirport: {
+                iataCode: string;
+            };
+        };
+    };
 }

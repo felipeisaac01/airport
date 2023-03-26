@@ -81,4 +81,44 @@ export class TicketRepository implements ITicketRepository {
             }
         })
     }
+
+    async getTicketById(id: string) {
+        return this.client.findFirst({
+            where: { id, deletedAt: null }
+        })
+    }
+
+    async getEmissionInfoByTicketId(id: string) {
+        return this.client.findFirst({
+            where: { id, deletedAt: null },
+            select: {
+                birthdate: true,
+                cpf: true,
+                name: true,
+                code: true,
+                luggage: true,
+                flightClass: {
+                    select: {
+                        type: true,
+                        flight: {
+                            select: {
+                                code: true,
+                                departureAirport: {
+                                    select: {
+                                        iataCode: true
+                                    }
+                                },
+                                destinationAirport: {
+                                    select: {
+                                        iataCode: true
+                                    }
+                                },
+                                departureTime: true,
+                            }
+                        }
+                    }
+                }
+            }
+        })
+    }
 }

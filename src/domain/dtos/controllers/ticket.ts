@@ -13,6 +13,7 @@ export interface IPurchaseTicketDto {
 }
 
 export interface IPurchasedTicketDto {
+    id: string;
     lugaggeCode: string | undefined,
     code: string,
     passenger: {
@@ -46,4 +47,17 @@ export interface IGetAvailableTicketsForPurchaseResponseDto {
         code: string;
         departureTime: Date;
     };
+}
+
+export interface IEmitTicketResponseDto {
+    flightCode: string;
+    ticketCode: string;
+    departureAirport: string;
+    destinationAirport: string;
+    passenger: {
+        cpf: string;
+        birthdate: Date;
+        name: string;
+    },
+    luggage: boolean;
 }

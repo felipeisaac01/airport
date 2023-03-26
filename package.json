@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "ts-node src/server",
     "migration:create": "npx prisma migrate dev --name",
+    "migration:run": "npx prisma migrate dev",
     "prisma:generate": "npx prisma generate",
+    "database:reset": "npx prisma migrate reset",
     "database:create": "docker run --name postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

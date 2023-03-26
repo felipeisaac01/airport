@@ -14,6 +14,7 @@ export interface IGetFilteredClassesForPurchaseResponseDto {
     value: number;
     quantity: number;
     flight: {
+        id: string;
         code: string;
         departureTime: Date;
     };

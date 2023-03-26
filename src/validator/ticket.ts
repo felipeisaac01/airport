@@ -1,7 +1,6 @@
 import Joi from "joi";
 
 export const purchaseTicketBodyValidator = Joi.object({
-    flightId: Joi.string().required(),
     classType: Joi.string().required().valid("A", "B", "C", "D", "E"),
     passengers: Joi.array().required().items(Joi.object({
         cpf: Joi.string().required(),

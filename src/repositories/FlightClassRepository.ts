@@ -58,6 +58,7 @@ export class FlightClassRepository implements IFlightClassRepository  {
                 quantity: true,
                 flight: {
                     select: {
+                        id: true,
                         code: true, 
                         departureTime: true,
                     }

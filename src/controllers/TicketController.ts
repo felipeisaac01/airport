@@ -4,6 +4,7 @@ import { getTokeninfo } from "../helpers/auth";
 import { repositories } from "../repositories";
 import { isValid as validateCpf } from "@fnando/cpf"
 import { 
+    IEmitTicketResponseDto,
     IGetAvailableTicketsForPurchaseResponseDto, 
     IGetTicketsForPurchaseParamsDto, 
     IPurchasedTicketDto, 
@@ -13,7 +14,7 @@ import { ICreateTicketItemMethodDto } from "../domain/dtos/repositories/TicketRe
 import { generateRandomCode } from "../helpers/randomCode";
 import { bodyValidator } from "../helpers/bodyValidator";
 import { getTicketsForPurchaseQueryValidator, purchaseTicketBodyValidator } from "../validator/ticket";
-import { isPast } from "date-fns";
+import { isPast, subHours } from "date-fns";
 
 export async function purchaseTicket(req: Request<{ flightId: string }, {}, IPurchaseTicketDto>, res: Response<IPurchasedTicketDto[]>) {
     bodyValidator(purchaseTicketBodyValidator, req.body, "PT");
@@ -62,6 +63,7 @@ export async function purchaseTicket(req: Request<{ flightId: string }, {}, IPur
 
     return res.status(201).send(ticketsCreated.map(ticket => {
         return {
+            id: ticket.id,
             lugaggeCode: ticket.luggage?.code,
             code: ticket.code,
             passenger: {
@@ -154,4 +156,42 @@ export async function getAvailableTicketsForPurchase(
     }
 
     return res.send(availableClasses)
+}
+
+export async function emitTicket(req: Request<{ ticketId: string }>, res: Response<IEmitTicketResponseDto>) {
+    const { ticketId } = req.params
+    // console.log({ticketId})
+    
+    const ticket = await repositories.ticket.getTicketById(ticketId);
+    // console.log({ticket})
+    
+    if (!ticket) {
+        throw new NotFoundError("Ticket not found.", "ET-01")
+    }
+    
+    const emissionInfo = (await repositories.ticket.getEmissionInfoByTicketId(ticketId))!
+    
+
+    console.log({emissionInfo})
+
+    if (new Date() < subHours(emissionInfo.flightClass.flight.departureTime, 5)) {
+        throw new BadRequestError("You can only emit tickets 5 hours before departure time.", "ET-02")
+    }
+
+    if (new Date() > emissionInfo.flightClass.flight.departureTime) {
+        throw new BadRequestError("Flight has already left", "ET-03")
+    }
+
+    res.send({
+        flightCode: emissionInfo.flightClass.flight.code,
+        ticketCode: emissionInfo.code,
+        departureAirport: emissionInfo.flightClass.flight.departureAirport.iataCode,
+        destinationAirport: emissionInfo.flightClass.flight.destinationAirport.iataCode,
+        passenger: {
+            cpf: emissionInfo.cpf,
+            birthdate: emissionInfo.birthdate,
+            name: emissionInfo.name
+        },
+        luggage: Boolean(emissionInfo.luggage),
+    })
 }
