@@ -160,4 +160,25 @@ export class FlightRepository implements IFlightRepository {
             }
         })
     }
+
+    async getFlightPassengers(flightId: string) {
+        return this.client.findFirst({
+            where: { id: flightId },
+            select: {
+                flightClasses: {
+                    select: {
+                        type: true,
+                        tickets: {
+                            select: {
+                                birthdate:true,
+                                cpf:true,
+                                name: true,
+                                code: true
+                            }
+                        }
+                    }
+                }
+            }
+        })
+    }
 }

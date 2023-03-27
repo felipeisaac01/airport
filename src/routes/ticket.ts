@@ -6,6 +6,6 @@ const routes = Router()
 
 routes.post("/ticket/:flightId", authenticateBuyer, purchaseTicket)
 routes.get("/available-tickets", authenticateBuyer, getAvailableTicketsForPurchase)
-routes.get("/emit-ticket/:ticketId", emitTicket)
+routes.get("/ticket/:ticketId/emit", emitTicket)
 
 export default routes

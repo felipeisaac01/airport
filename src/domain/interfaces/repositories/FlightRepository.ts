@@ -4,6 +4,7 @@ import {
     ICreateFlightMethodDto, 
     ICreateFlightMethodResponseDto, 
     IGetFlightMethodDto, 
+    IGetFlightPassengersMethodResponse, 
     IUpdateFlightMethodDto, 
     IUpdateFlightMethodResponseDto 
 } from "../../dtos/repositories/FlightRepository";
@@ -14,4 +15,5 @@ export interface IFlightRepository {
     update: (id: string, data: IUpdateFlightMethodDto) => Promise<IUpdateFlightMethodResponseDto>
     cancel: (id: string) => Promise<ICancelFlightResponseDto>
     checkIfCodeIsInUse: (code: string, id: string) => Promise<Flight | null>
+    getFlightPassengers: (flightId: string) => Promise<IGetFlightPassengersMethodResponse | null>
 }

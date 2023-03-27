@@ -1,3 +1,5 @@
+import { FlightClassOptions } from "@prisma/client";
+
 export enum FlightClassType {
     A = "A",
     B = "B",
@@ -101,4 +103,14 @@ export interface IGetFlightsResponseDto {
         id: string;
         iataCode: string;
     };
+}
+
+export interface IGetFlightPassengersDto {
+    passengers: {
+        class: FlightClassOptions
+        name: string;
+        cpf: string;
+        birthdate: Date;
+        code: string;
+    }[]
 }

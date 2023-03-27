@@ -5,7 +5,8 @@ import {
     IUpdateFlightDto, 
     IUpdateFlightResponseDto,
     ICancelFlightResponseDto,
-    IGetFlightsResponseDto
+    IGetFlightsResponseDto,
+    IGetFlightPassengersDto
 } from "../domain/dtos/controllers/flight";
 import { BadRequestError, NotFoundError } from "../errors/apiErrors";
 import { repositories } from "../repositories";
@@ -260,4 +261,28 @@ export async function getFlights(req: Request, res: Response<IGetFlightsResponse
     const flights = await repositories.flight.getFlights();
 
     return res.send(flights)
+}
+
+//TODO TESTAR
+export async function getFlightPassengers(req: Request<{ flightId: string }>, res: Response<IGetFlightPassengersDto>) {
+    const { flightId } = req.params;
+
+    const flightWithPassengers = await repositories.flight.getFlightPassengers(flightId);
+
+    if (!flightWithPassengers) {
+        throw new BadRequestError("Flight not found", "GFP-01");
+    }
+
+    const classes = flightWithPassengers.flightClasses.flat()
+
+    const ticketsWithClass = classes.map(item => {
+        return item.tickets.map(ticket => {
+            return {
+                class: item.type,
+                ...ticket
+            }
+        })
+    }).flat();
+
+    return res.send({ passengers: ticketsWithClass})
 }

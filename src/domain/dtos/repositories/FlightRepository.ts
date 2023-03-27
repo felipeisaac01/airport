@@ -1,3 +1,4 @@
+import { FlightClassOptions } from "@prisma/client";
 import { FlightClassType } from "../controllers/flight";
 
 export interface ICreateFlightMethodDto {
@@ -79,4 +80,16 @@ export interface IUpdateFlightMethodResponseDto {
 
 export interface ICancelFlightResponseDto {
     status: string
+}
+
+export interface IGetFlightPassengersMethodResponse {
+    flightClasses: {
+        type: FlightClassOptions;
+        tickets: {
+            birthdate: Date;
+            cpf: string;
+            name: string;
+            code: string;
+        }[];
+    }[]
 }
