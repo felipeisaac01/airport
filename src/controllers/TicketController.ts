@@ -227,3 +227,17 @@ export async function getBuyersTickets(req: Request<{ buyerId: string }>, res: R
         }
     })
 }
+
+export async function cancelPurchase(req: Request<{ ticketId: string }>, res: Response) {
+    const { ticketId } = req.params;
+
+    const ticket = await repositories.ticket.getTicketById(ticketId);
+
+    if (!ticket) {
+        throw new NotFoundError("Given ticket not found", "CT-01");
+    }
+
+    const updatedTicket = await repositories.ticket.cancelTicket(ticketId)
+
+    return res.send({ updatedTicket })
+}

@@ -126,6 +126,7 @@ model Ticket {
   cpf           String
   birthdate     DateTime
   totalValue    Int
+  canceled      Boolean     @default(false)
   flightClass   FlightClass @relation(fields: [flightClassId], references: [id])
   flightClassId String
   buyerId       String
