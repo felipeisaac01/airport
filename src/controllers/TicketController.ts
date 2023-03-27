@@ -6,6 +6,7 @@ import { isValid as validateCpf } from "@fnando/cpf"
 import { 
     IEmitTicketResponseDto,
     IGetAvailableTicketsForPurchaseResponseDto, 
+    IGetBuyersTicketsResponseDto, 
     IGetTicketsForPurchaseParamsDto, 
     IPurchasedTicketDto, 
     IPurchaseTicketDto 
@@ -188,5 +189,41 @@ export async function emitTicket(req: Request<{ ticketId: string }>, res: Respon
             name: emissionInfo.name
         },
         luggage: Boolean(emissionInfo.luggage),
+    })
+}
+
+// TODO testar amanha
+export async function getBuyersTickets(req: Request<{ buyerId: string }>, res: Response<IGetBuyersTicketsResponseDto>) {
+    const { buyerId } = req.params;
+
+    const buyer = await repositories.user.getById(buyerId);
+
+    if (!buyer) {
+        throw new NotFoundError("Givern buyer not found.", "GBT-01");
+    }
+
+    const tickets = await repositories.ticket.getTicketsBybuyerId(buyerId);
+
+    return res.send({
+        buyer: {
+            name: buyer.name!,
+            email: buyer.email!,
+            cpf: buyer.cpf!,
+            birthdate: buyer.birthDate!,
+            tickets: tickets.map(ticket => {
+                return {
+                    passenger: {
+                        name: ticket.name,
+                        cpf: ticket.cpf,
+                        birthdate: ticket.birthdate
+                    },
+                    flight: ticket.flightClass.flight,
+                    id: ticket.id,
+                    luggage: ticket.luggage,
+                    totalValue: ticket.totalValue,
+                    code: ticket.code
+                }
+            })
+        }
     })
 }

@@ -61,3 +61,35 @@ export interface IEmitTicketResponseDto {
     },
     luggage: boolean;
 }
+
+export interface IGetBuyersTicketsResponseDto {
+    buyer: {
+        name: string;
+        email:string; 
+        cpf: string;
+        birthdate: Date;
+        tickets: {
+            passenger: {
+                name: string;
+                cpf: string;
+                birthdate: Date;
+            },
+            flight: {
+                code: string;
+                departureTime: Date;
+                departureAirport: {
+                    iataCode: string;
+                };
+                destinationAirport: {
+                    iataCode: string;
+                };
+            };
+            id: string;
+            luggage: {
+                code: string;
+            } | null;
+            totalValue: number;
+            code: string;
+        }[]
+    }
+}

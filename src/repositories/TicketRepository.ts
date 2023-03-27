@@ -121,4 +121,46 @@ export class TicketRepository implements ITicketRepository {
             }
         })
     }
+
+    async getTicketsBybuyerId(buyerId: string) {
+        return this.client.findMany({
+            where: {
+                buyerId,
+                deletedAt: null
+            },
+            select: {
+                birthdate: true,
+                cpf: true,
+                code: true,
+                luggage: {
+                    select: {
+                        code: true
+                    }
+                },
+                name:true,
+                totalValue:true,
+                id: true,
+                flightClass: {
+                    select: {
+                        flight: {
+                            select: {
+                                departureAirport: {
+                                    select: {
+                                        iataCode: true
+                                    }
+                                },
+                                destinationAirport: {
+                                    select: {
+                                        iataCode: true
+                                    }
+                                },
+                                departureTime: true,
+                                code: true,
+                            }
+                        }
+                    }
+                },
+            }
+        })
+    }
 }
