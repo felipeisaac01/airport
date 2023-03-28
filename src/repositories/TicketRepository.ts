@@ -12,7 +12,8 @@ export class TicketRepository implements ITicketRepository {
         return this.client.count({
             where: {
                 flightClassId,
-                deletedAt: null 
+                deletedAt: null,
+                canceled: false 
             }
         })
     }
@@ -75,6 +76,7 @@ export class TicketRepository implements ITicketRepository {
             where: {
                 deletedAt: null,
                 flightClassId: { in: flightClassesIds },
+                canceled: false
             },
             _count: {
                 id: true
@@ -97,12 +99,14 @@ export class TicketRepository implements ITicketRepository {
                 name: true,
                 code: true,
                 luggage: true,
+                buyerId: true,
                 flightClass: {
                     select: {
                         type: true,
                         flight: {
                             select: {
                                 code: true,
+                                status: true,
                                 departureAirport: {
                                     select: {
                                         iataCode: true
@@ -132,6 +136,7 @@ export class TicketRepository implements ITicketRepository {
                 birthdate: true,
                 cpf: true,
                 code: true,
+                canceled: true,
                 luggage: {
                     select: {
                         code: true
@@ -168,6 +173,44 @@ export class TicketRepository implements ITicketRepository {
         return this.client.update({
             where: { id },
             data: { canceled: true }
+        })
+    }
+
+    async getFlightInfo(ticketId: string) {
+        const response = await this.client.findFirst({
+            where: { id: ticketId },
+            select: {
+                flightClass: {
+                    select: {
+                        flight: {
+                            select: {
+                                departureTime: true,
+                                status: true
+                            }
+                        }
+                    }
+                }
+            }
+        })
+
+        return response?.flightClass.flight
+    }
+
+    async getTicketsByFlightId(flightId: string) {
+        return this.client.findMany({
+            where: {
+                canceled: false,
+                flightClass: {
+                    flightId
+                }
+            },
+            include: {
+                flightClass: {
+                    select: {
+                        type: true
+                    }
+                }
+            }
         })
     }
 }

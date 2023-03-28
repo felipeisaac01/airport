@@ -41,6 +41,7 @@ export interface IGetFlightMethodDto {
     code: string,
     departureTime: Date,
     id: string,
+    status: "CONFIRMED" | "CANCELED"
     departureAirport: {
         cityId: string,
         id: string
@@ -86,6 +87,7 @@ export interface IGetFlightPassengersMethodResponse {
     flightClasses: {
         type: FlightClassOptions;
         tickets: {
+            buyerId: string;
             birthdate: Date;
             cpf: string;
             name: string;

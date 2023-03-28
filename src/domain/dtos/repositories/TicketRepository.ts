@@ -46,9 +46,11 @@ export interface IGetEmissionInfoByTicketIdResponseDto {
     name: string;
     luggage: Luggage | null;
     code: string;
+    buyerId: string;
     flightClass: {
         type: FlightClassOptions;
         flight: {
+            status: string;
             code: string;
             departureTime: Date;
             departureAirport: {
@@ -59,4 +61,34 @@ export interface IGetEmissionInfoByTicketIdResponseDto {
             };
         };
     };
+}
+
+export interface IGetTicketsBybuyerIdDto {
+    id: string;
+    code: string;
+    name: string;
+    birthdate: Date;
+    cpf: string;
+    flightClass: {
+        flight: {
+            departureTime: Date;
+            code: string;
+            departureAirport: {
+                iataCode: string;
+            };
+            destinationAirport: {
+                iataCode: string;
+            };
+        };
+    };
+    luggage: {
+        code: string;
+    } | null;
+    totalValue: number;
+    canceled: boolean;
+}
+
+export interface IGetFlightInfoMethodResponseDto {
+    departureTime: Date;
+    status: "CANCELED" | "CONFIRMED"
 }

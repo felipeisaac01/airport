@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { BadRequestError, NotFoundError } from "../errors/apiErrors";
 import { getTokeninfo } from "../helpers/auth";
 import { repositories } from "../repositories";
-import { isValid as validateCpf } from "@fnando/cpf"
+import { isValid as validateCpf, strip } from "@fnando/cpf"
 import { 
     IEmitTicketResponseDto,
     IGetAvailableTicketsForPurchaseResponseDto, 
@@ -31,27 +31,32 @@ export async function purchaseTicket(req: Request<{ flightId: string }, {}, IPur
         throw new NotFoundError("Flight not found.", "PT-02");
     }
 
+    if (flight.status === "CANCELED") {
+        throw new BadRequestError("Given flight was canceled.", "PT-03")
+    }
+
     const flightClass = await repositories.flightClass.getByFlightAndType(flightId, classType);
 
     if (!flightClass) {
-        throw new NotFoundError("Flight class not found.", "PT-03");
+        throw new NotFoundError("Flight class not found.", "PT-04");
     }
 
     const classExistingTickets = await repositories.ticket.getCountByClass(flightClass.id);
 
     if (flightClass.quantity < classExistingTickets + passengers.length) {
-        throw new BadRequestError("Flight class capacity already reached.", "PT-04");
+        throw new BadRequestError("Flight class capacity already reached.", "PT-05");
     }
 
     const ticketsToBeCreated: ICreateTicketItemMethodDto[] = [];
 
     for (const passenger of passengers) {
         if (!validateCpf(passenger.cpf)) {
-            throw new BadRequestError(`${passenger.name}'s CPF is not valid`, "PT-05");;
+            throw new BadRequestError(`${passenger.name}'s CPF is not valid`, "PT-06");;
         }
 
         ticketsToBeCreated.push({
             ...passenger,
+            cpf: strip(passenger.cpf),
             luggage: passenger.luggage ? generateRandomCode(8, "ALPHANUMERIC") : undefined,
             flightClassId: flightClass.id,
             buyerId: user.id,
@@ -151,12 +156,30 @@ export async function getAvailableTicketsForPurchase(
 
     for (const flightClass of filteredClasses) {
         const flightClassCount = ticketsSold.find(item => item.flightClassId === flightClass.id)
-        if (!flightClassCount || (flightClassCount && flightClassCount._count.id < flightClass.quantity)) {
+        if (!flightClassCount) {
             availableClasses.push(flightClass)
+        } else if (flightClassCount && flightClassCount._count.id < flightClass.quantity) {
+            availableClasses.push({...flightClass, quantity: flightClass.quantity - flightClassCount._count.id })
         }
+
     }
 
-    return res.send(availableClasses)
+    const classesGroupedByClasses: IGetAvailableTicketsForPurchaseResponseDto[] = availableClasses.reduce((acc: IGetAvailableTicketsForPurchaseResponseDto[], cur) => {
+        const flightIndex = acc.map(item => item.flight.id).indexOf(cur.flight.id)
+
+        if (flightIndex === -1) {
+            acc.push({
+                flight: cur.flight,
+                tickets: [cur]
+            })
+        } else {
+            acc[flightIndex].tickets.push(cur)
+        }
+
+        return acc
+    }, [])
+
+    return res.send(classesGroupedByClasses)
 }
 
 export async function emitTicket(req: Request<{ ticketId: string }>, res: Response<IEmitTicketResponseDto>) {
@@ -170,15 +193,20 @@ export async function emitTicket(req: Request<{ ticketId: string }>, res: Respon
     
     const emissionInfo = (await repositories.ticket.getEmissionInfoByTicketId(ticketId))!
 
+    if (emissionInfo.flightClass.flight.status === "CANCELED") {
+        throw new BadRequestError("Given flight was canceled", "ET-02")
+    }
+
     if (new Date() < subHours(emissionInfo.flightClass.flight.departureTime, 5)) {
-        throw new BadRequestError("You can only emit tickets 5 hours before departure time.", "ET-02")
+        throw new BadRequestError("You can only emit tickets 5 hours before departure time.", "ET-03")
     }
 
     if (new Date() > emissionInfo.flightClass.flight.departureTime) {
-        throw new BadRequestError("Flight has already left", "ET-03")
+        throw new BadRequestError("Flight has already left", "ET-04")
     }
 
     res.send({
+        buyerId: emissionInfo.buyerId,
         flightCode: emissionInfo.flightClass.flight.code,
         ticketCode: emissionInfo.code,
         departureAirport: emissionInfo.flightClass.flight.departureAirport.iataCode,
@@ -192,7 +220,6 @@ export async function emitTicket(req: Request<{ ticketId: string }>, res: Respon
     })
 }
 
-// TODO testar amanha
 export async function getBuyersTickets(req: Request<{ buyerId: string }>, res: Response<IGetBuyersTicketsResponseDto>) {
     const { buyerId } = req.params;
 
@@ -221,7 +248,8 @@ export async function getBuyersTickets(req: Request<{ buyerId: string }>, res: R
                     id: ticket.id,
                     luggage: ticket.luggage,
                     totalValue: ticket.totalValue,
-                    code: ticket.code
+                    code: ticket.code,
+                    canceled: ticket.canceled
                 }
             })
         }

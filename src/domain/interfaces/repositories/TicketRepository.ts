@@ -2,7 +2,9 @@ import { Ticket } from "@prisma/client"
 import { 
     ICreateTicketItemMethodDto, 
     ICreateTicketItemMethodResponseDto, 
-    IGetEmissionInfoByTicketIdResponseDto
+    IGetEmissionInfoByTicketIdResponseDto,
+    IGetFlightInfoMethodResponseDto,
+    IGetTicketsBybuyerIdDto
 } from "../../dtos/repositories/TicketRepository"
 
 export interface ITicketRepository {
@@ -11,4 +13,7 @@ export interface ITicketRepository {
     getTicketCountByclassesIds: (flightClassesIds: string[]) => Promise<Array<{ flightClassId: string, _count: { id: number } }>>
     getTicketById: (id: string) => Promise<Ticket | null>
     getEmissionInfoByTicketId: (id: string) => Promise<IGetEmissionInfoByTicketIdResponseDto | null>
+    getTicketsBybuyerId: (buyerId: string) => Promise<IGetTicketsBybuyerIdDto[]>
+    cancelTicket: (id: string) => Promise<Ticket>
+    getFlightInfo: (ticketId: string) => Promise<IGetFlightInfoMethodResponseDto| undefined>
 }

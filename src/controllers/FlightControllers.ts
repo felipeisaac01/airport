@@ -15,6 +15,8 @@ import { bodyValidator } from "../helpers/bodyValidator";
 import { createFlightBodyValidator, updateFlightBodyValidator } from "../validator/flight";
 import { prismaClient } from "../prisma";
 import { Request, Response } from "express";
+import { format } from "@fnando/cpf"
+import { dateParser } from "../helpers/dateParser";
 
 export async function createFlight(req: Request<{}, {}, ICreateFlightDto>, res: Response<ICreateFlightResponseDto>) {
     bodyValidator(createFlightBodyValidator, req.body, "CF")
@@ -53,7 +55,7 @@ export async function createFlight(req: Request<{}, {}, ICreateFlightDto>, res: 
     const flight = await repositories.flight.createFlightWithClasses({ 
         destinationAirportId,
         departureAirportId,
-        departureTime,
+        departureTime: dateParser(departureTime),
         code: generateRandomCode(4, "NUMERIC"),
         classes
     })
@@ -130,115 +132,16 @@ export async function updateFlight(req: Request<{ flightId: string }, {} , IUpda
         }
     }
 
-    const necessaryDatabaseCalls = []
-
-    necessaryDatabaseCalls.push(prismaClient.flight.update({
-        where: { id:flightId },
-        data: {
-            code,
-            departureAirportId,
-            destinationAirportId,
-            departureTime,
-        },
-        select: {
-            code: true,
-            departureTime: true,
-            id: true,
-            departureAirport: {
-                select: {
-                    iataCode: true,
-                    name: true,
-                    id: true
-                }
-            },
-            destinationAirport: {
-                select: {
-                    iataCode: true,
-                    name: true,
-                    id: true
-                }
-            },
-        }
-    }))
-
-    if (classes) {
-        if (!classes.length) {
-            throw new BadRequestError("Flights must have at least one class", "UF-14")
-        }
-
-        for (const flightClass of classes) {
-            if (classes.filter(item => item.type === flightClass.type).length > 1) {
-                throw new BadRequestError("There can not be two classes with the same type", "UF-15")
-            }
-        }
-
-        const classesToUpdate = [];
-        const classesToCreate = [];
-        let classesToDelete = flight.flightClasses;
-    
-        for (const flightClass of classes) {
-            const [existingClass] = flight.flightClasses.filter(item => item.type === flightClass.type)
-
-            if (existingClass) {
-                classesToUpdate.push({
-                    id: existingClass.id,
-                    ...flightClass
-                })
-                classesToDelete = classesToDelete.filter(item => item.type !== flightClass.type)
-                continue
-            }
-
-            classesToCreate.push({ flightId, ...flightClass})
-        }
-
-        if (classesToCreate.length) {
-            necessaryDatabaseCalls.push(
-                prismaClient.flightClass.createMany({
-                    data: classesToCreate
-                })
-            )
-        }
-    
-        if (classesToUpdate.length) {
-            for (const classToUpdate of classesToUpdate) {
-                const ticketsSold = await repositories.ticket.getCountByClass(classToUpdate.id);
-
-                if (ticketsSold > classToUpdate.quantity) {
-                    throw new BadRequestError(
-                        `There are more tickets sold to the ${classToUpdate.type} class than the new value for quantity.`,
-                        "UF-16"
-                    )
-                }
-
-                necessaryDatabaseCalls.push(
-                    prismaClient.flightClass.update({
-                        where: { id: classToUpdate.id },
-                        data: {
-                            quantity: classToUpdate.quantity,
-                            value: classToUpdate.value,
-                        }
-                    })
-                )
-            }
-        }
-    
-        if (classesToDelete.length) {
-            necessaryDatabaseCalls.push(
-                prismaClient.flightClass.deleteMany({
-                    where: {
-                         id: { 
-                            in: classesToDelete.map(item => item.id ) 
-                        } 
-                    }
-                })
-            )
-        }
+    if (flight.status === "CANCELED") {
+        throw new BadRequestError("Given flight was canceled", "UF-13")
     }
 
-    await prismaClient.$transaction(necessaryDatabaseCalls)
-
-
-    const updatedFlight = (await repositories.flight.get(flightId))!
+    const updatedFlight = await repositories.flight.update(flightId, {
+        code,
+        departureAirportId,
+        destinationAirportId,
+        departureTime: departureTime ? dateParser(departureTime) : undefined,
+    })
 
     return res.send(updatedFlight)
 }
@@ -263,26 +166,27 @@ export async function getFlights(req: Request, res: Response<IGetFlightsResponse
     return res.send(flights)
 }
 
-//TODO TESTAR
 export async function getFlightPassengers(req: Request<{ flightId: string }>, res: Response<IGetFlightPassengersDto>) {
     const { flightId } = req.params;
+    
 
-    const flightWithPassengers = await repositories.flight.getFlightPassengers(flightId);
+    const flights = await repositories.flight.get(flightId);
 
-    if (!flightWithPassengers) {
+
+    if (!flights) {
         throw new BadRequestError("Flight not found", "GFP-01");
     }
 
-    const classes = flightWithPassengers.flightClasses.flat()
+    const passengers = (await repositories.ticket.getTicketsByFlightId(flightId)).map(ticket => {
+        return {
+            class: ticket.flightClass.type,
+            name: ticket.name,
+            birthdate: ticket.birthdate,
+            code: ticket.code,
+            cpf: format(ticket.cpf)
+        }
+    })
 
-    const ticketsWithClass = classes.map(item => {
-        return item.tickets.map(ticket => {
-            return {
-                class: item.type,
-                ...ticket
-            }
-        })
-    }).flat();
 
-    return res.send({ passengers: ticketsWithClass})
+    return res.send({ passengers })
 }

@@ -6,7 +6,6 @@ import { repositories } from "../repositories";
 import { createClassBodyValidator, updateClassBodyValidator } from "../validator/flightClass";
 
 
-// TODO TESTAR
 export async function createFlightClass(req: Request<{}, {}, ICreateClassDto>, res: Response<ICreateClassResponseDto>) {
     bodyValidator(createClassBodyValidator, req.body, "CFC")
     const { type, flightId } = req.body;
@@ -26,8 +25,6 @@ export async function createFlightClass(req: Request<{}, {}, ICreateClassDto>, r
     return res.status(201).send(createdClass)
 }
 
-
-// TODO TESTAR
 export async function updateFlightClass(req: Request<{}, {}, IUpdateClassDto>, res: Response<IUpdateClassResponseDto>) {
     bodyValidator(updateClassBodyValidator, req.body, "UFC")
     const { quantity, id } = req.body;

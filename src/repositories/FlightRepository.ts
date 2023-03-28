@@ -59,12 +59,13 @@ export class FlightRepository implements IFlightRepository {
         return this.client.findFirst({ 
             where: { 
                 id, 
-                deletedAt: null 
+                deletedAt: null
             },
             select: {
                 code: true,
                 departureTime: true,
                 id: true,
+                status: true,
                 departureAirport: {
                     select: {
                         id: true,
@@ -163,7 +164,9 @@ export class FlightRepository implements IFlightRepository {
 
     async getFlightPassengers(flightId: string) {
         return this.client.findFirst({
-            where: { id: flightId },
+            where: { 
+                id: flightId,
+            },
             select: {
                 flightClasses: {
                     select: {
@@ -173,7 +176,8 @@ export class FlightRepository implements IFlightRepository {
                                 birthdate:true,
                                 cpf:true,
                                 name: true,
-                                code: true
+                                code: true,
+                                buyerId: true
                             }
                         }
                     }

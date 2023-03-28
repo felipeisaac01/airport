@@ -19,7 +19,10 @@ export interface ICreateFlightDto {
     departureAirportId: string;
     destinationAirportId: string;
     classes: IFlightClassesDto[];
-    departureTime: Date;
+    departureTime: {
+        date: string;
+        time: string
+    };
 }
 
 export interface ICreateFlightResponseDto {
@@ -55,32 +58,28 @@ export interface IUpdateFlightClassDto {
 export interface IUpdateFlightDto {
     departureAirportId: string | undefined;
     destinationAirportId: string | undefined;
-    departureTime: Date | undefined;
+    departureTime: {
+        date: string;
+        time: string
+    } | undefined;
     code: string | undefined;
     classes: IUpdateFlightClassDto[] | undefined;
 }
 
 export interface IUpdateFlightResponseDto {
-    departureTime: Date;
     id: string;
+    departureTime: Date;
     code: string;
     departureAirport: {
         id: string;
         name: string;
         iataCode: string;
-        cityId: string;
     };
     destinationAirport: {
         id: string;
         name: string;
         iataCode: string;
     };
-    flightClasses: {
-        id: string,
-        type: string,
-        value: number,
-        quantity: number
-    }[]
 }
 
 export interface ICancelFlightResponseDto {

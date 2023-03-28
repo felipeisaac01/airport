@@ -39,17 +39,21 @@ export interface IGetTicketsForPurchaseParamsDto extends ParsedQs {
 }
 
 export interface IGetAvailableTicketsForPurchaseResponseDto {
-    id: string;
-    type: FlightClassOptions;
-    value: number;
-    quantity: number;
     flight: {
+        id: string
         code: string;
         departureTime: Date;
     };
+    tickets: {
+        id: string;
+        type: FlightClassOptions;
+        value: number;
+        quantity: number;
+    }[]
 }
 
 export interface IEmitTicketResponseDto {
+    buyerId: string;
     flightCode: string;
     ticketCode: string;
     departureAirport: string;
@@ -90,6 +94,7 @@ export interface IGetBuyersTicketsResponseDto {
             } | null;
             totalValue: number;
             code: string;
+            canceled: boolean;
         }[]
     }
 }
