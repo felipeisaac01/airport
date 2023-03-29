@@ -12,7 +12,7 @@ export async function authenticateBuyer(req: Request, res: Response, next: NextF
 
     let decoded: IAuthTokenDto;
     try {
-        decoded = verify(token, process.env.JWT_TOKEN ?? "/") as IAuthTokenDto;
+        decoded = verify(token, process.env.JWT_SECRET ?? "/") as IAuthTokenDto;
 
         next();
     } catch (e) {
