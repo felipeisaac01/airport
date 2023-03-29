@@ -88,6 +88,15 @@ export interface IGetTicketsBybuyerIdDto {
     canceled: boolean;
 }
 
+export interface ICancelPurchaseMethodResponseDto {
+    birthdate: Date;
+    cpf: string;
+    code: string;
+    canceled: boolean;
+    name: string;
+    totalValue: number;
+}
+
 export interface IGetFlightInfoMethodResponseDto {
     departureTime: Date;
     status: "CANCELED" | "CONFIRMED"

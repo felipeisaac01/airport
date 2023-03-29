@@ -66,7 +66,7 @@ export async function createFlight(req: Request<{}, {}, ICreateFlightDto>, res: 
 export async function updateFlight(req: Request<{ flightId: string }, {} , IUpdateFlightDto>, res: Response<IUpdateFlightResponseDto>) {
     bodyValidator(updateFlightBodyValidator, req.body, "UF")
     const { flightId } = req.params
-    const { departureAirportId, departureTime, destinationAirportId, code, classes } = req.body;
+    const { departureAirportId, departureTime, destinationAirportId, code } = req.body;
 
     const flight = await repositories.flight.get(flightId);
 

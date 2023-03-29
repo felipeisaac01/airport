@@ -63,7 +63,6 @@ export interface IUpdateFlightDto {
         time: string
     } | undefined;
     code: string | undefined;
-    classes: IUpdateFlightClassDto[] | undefined;
 }
 
 export interface IUpdateFlightResponseDto {

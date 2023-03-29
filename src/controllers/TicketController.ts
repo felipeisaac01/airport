@@ -4,6 +4,7 @@ import { getTokeninfo } from "../helpers/auth";
 import { repositories } from "../repositories";
 import { isValid as validateCpf, strip } from "@fnando/cpf"
 import { 
+    ICancelPurchaseResponseDto,
     IEmitTicketResponseDto,
     IGetAvailableTicketsForPurchaseResponseDto, 
     IGetBuyersTicketsResponseDto, 
@@ -16,6 +17,7 @@ import { generateRandomCode } from "../helpers/randomCode";
 import { bodyValidator } from "../helpers/bodyValidator";
 import { getTicketsForPurchaseQueryValidator, purchaseTicketBodyValidator } from "../validator/ticket";
 import { isPast, subHours } from "date-fns";
+import { dateParser } from "../helpers/dateParser";
 
 export async function purchaseTicket(req: Request<{ flightId: string }, {}, IPurchaseTicketDto>, res: Response<IPurchasedTicketDto[]>) {
     bodyValidator(purchaseTicketBodyValidator, req.body, "PT");
@@ -110,7 +112,7 @@ export async function getAvailableTicketsForPurchase(
         throw new NotFoundError("Destination airport not found.", "GTP-03")
     }
 
-    const date = dateString ? new Date(dateString) : undefined
+    const date = dateString ? dateParser({ date: dateString, time: "00:00" }) : undefined
 
     if (date) {
         if (isNaN(date.valueOf())) {
@@ -256,7 +258,7 @@ export async function getBuyersTickets(req: Request<{ buyerId: string }>, res: R
     })
 }
 
-export async function cancelPurchase(req: Request<{ ticketId: string }>, res: Response) {
+export async function cancelPurchase(req: Request<{ ticketId: string }>, res: Response<ICancelPurchaseResponseDto>) {
     const { ticketId } = req.params;
 
     const ticket = await repositories.ticket.getTicketById(ticketId);
@@ -265,7 +267,7 @@ export async function cancelPurchase(req: Request<{ ticketId: string }>, res: Re
         throw new NotFoundError("Given ticket not found", "CT-01");
     }
 
-    const updatedTicket = await repositories.ticket.cancelTicket(ticketId)
+    const canceledTicket = await repositories.ticket.cancelTicket(ticketId)
 
-    return res.send({ updatedTicket })
+    return res.send({ canceledTicket })
 }

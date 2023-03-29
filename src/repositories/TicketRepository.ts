@@ -172,7 +172,15 @@ export class TicketRepository implements ITicketRepository {
     async cancelTicket(id: string) {
         return this.client.update({
             where: { id },
-            data: { canceled: true }
+            data: { canceled: true },
+            select: {
+                code: true,
+                canceled: true,
+                cpf: true,
+                name: true,
+                totalValue: true,
+                birthdate: true
+            }
         })
     }
 

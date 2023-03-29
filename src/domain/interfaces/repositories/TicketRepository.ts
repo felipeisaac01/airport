@@ -1,5 +1,6 @@
 import { Ticket } from "@prisma/client"
 import { 
+    ICancelPurchaseMethodResponseDto,
     ICreateTicketItemMethodDto, 
     ICreateTicketItemMethodResponseDto, 
     IGetEmissionInfoByTicketIdResponseDto,
@@ -14,6 +15,6 @@ export interface ITicketRepository {
     getTicketById: (id: string) => Promise<Ticket | null>
     getEmissionInfoByTicketId: (id: string) => Promise<IGetEmissionInfoByTicketIdResponseDto | null>
     getTicketsBybuyerId: (buyerId: string) => Promise<IGetTicketsBybuyerIdDto[]>
-    cancelTicket: (id: string) => Promise<Ticket>
+    cancelTicket: (id: string) => Promise<ICancelPurchaseMethodResponseDto>
     getFlightInfo: (ticketId: string) => Promise<IGetFlightInfoMethodResponseDto| undefined>
 }

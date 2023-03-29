@@ -8,7 +8,7 @@ export interface IPurchaseTicketDto {
         cpf: string,
         birthdate: Date,
         name: string
-        luggage: true
+        luggage: boolean
     }[]
 }
 
@@ -96,5 +96,16 @@ export interface IGetBuyersTicketsResponseDto {
             code: string;
             canceled: boolean;
         }[]
+    }
+}
+
+export interface ICancelPurchaseResponseDto {
+    canceledTicket: {
+        birthdate: Date;
+        cpf: string;
+        code: string;
+        canceled: boolean;
+        name: string;
+        totalValue: number;
     }
 }
